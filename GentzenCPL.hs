@@ -24,8 +24,7 @@ data Formula :: * where
   deriving (Show, Eq)
 
 type family (:++:) (a :: [Formula]) (b :: [Formula]) :: [Formula] where
-  '[] :++: x = x
-  '[x] :++: y = (x:y)
+  '[]    :++: x = x
   (x:xs) :++: y = x:(xs :++: y)
 
 data Derives :: [Formula] -> [Formula] -> * where
