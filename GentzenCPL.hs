@@ -34,15 +34,15 @@ data Formula :: * where
 $(genSingletons[''Atom, ''Formula])
 
 data Derives :: [Formula] -> [Formula] -> * where
-  I      :: Sing a -> Derives '[a] '[a]
+  I      :: SingI a => Derives '[a] '[a]
   Cut    :: SingI a =>
             Derives gamma (a:delta) ->
             Derives (a:sigma) pi ->
             Derives (gamma :++ sigma) (delta :++ pi)
-  LConj1 :: Sing b ->
+  LConj1 :: SingI b =>
             Derives (a:gamma) delta ->
             Derives ((And a b):gamma) delta
-  LConj2 :: Sing a ->
+  LConj2 :: SingI a =>
             Derives (b:gamma) delta ->
             Derives ((And a b):gamma) delta
   LDisj  :: Derives (a:gamma) delta ->
@@ -51,13 +51,13 @@ data Derives :: [Formula] -> [Formula] -> * where
   LImp   :: Derives (gamma) (a:delta) ->
             Derives (b:sigma) pi ->
             Derives ((Imp a b):(gamma :++ sigma)) (delta :++ pi)
-  LNot   :: Sing a ->
+  LNot   :: SingI a =>
             Derives gamma delta ->
             Derives ((Not a):gamma) delta
-  RDisj1 :: Sing b ->
+  RDisj1 :: SingI b =>
             Derives gamma (a:delta) ->
             Derives gamma ((Or a b):delta)
-  RDisj2 :: Sing a ->
+  RDisj2 :: SingI a =>
             Derives gamma (b:delta) ->
             Derives gamma ((Or a b):delta)
   RConj  :: Derives gamma (a:delta) ->
@@ -67,7 +67,7 @@ data Derives :: [Formula] -> [Formula] -> * where
             Derives gamma ((Imp a b):delta)
   RNot   :: Derives (a:gamma) delta ->
             Derives gamma ((Not a):delta)
-  LW     :: Sing a ->
+  LW     :: SingI a =>
             Derives gamma delta ->
             Derives (a:gamma) delta
   CL     :: Derives (a:a:gamma) delta ->
@@ -126,21 +126,21 @@ vc = SVar SC
 neg = SNot
 
 simple :: Derives '[Var A] '[Var A]
-simple = I va
+simple = I
 
 excludedMiddle :: Derives '[] '[Or (Var A) (Not (Var A))]
-excludedMiddle = CR . RDisj1 (SNot va) . PR . RDisj2 va . RNot $ I va
+excludedMiddle = CR . RDisj1 . PR . RDisj2 . RNot $ I
 
 disjComm :: Derives '[] '[Imp (Or (Var A) (Var B))
                            (Or (Var B) (Var A))]
-disjComm = RImp (CR (LDisj (RDisj2 vb (I va)) (RDisj1 va (I vb))))
+disjComm = RImp (CR (LDisj (RDisj2 I) (RDisj1 I)))
 
 printExcludedMiddle :: IO (Derives '[] '[Or (Var A) (Not (Var A))])
-printExcludedMiddle = let a = I va
+printExcludedMiddle = let a = I
                           b = RNot a
-                          c = RDisj2 va b
+                          c = RDisj2 b
                           d = PR c
-                          e = RDisj1 (neg va) d
+                          e = RDisj1 d
                           f = CR e in
                         putStrLn "------------" >>
                         putStrLn (pp a) >>
