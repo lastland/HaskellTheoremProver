@@ -15,6 +15,7 @@ import           Data.Singletons
 import           Data.Singletons.Prelude.List ((:++), SList)
 import qualified Data.Singletons.Prelude.List as S
 import           Data.Singletons.TH
+import           ProofTree
 import           Text.PrettyPrint
 
 data Atom :: * where
@@ -34,96 +35,120 @@ data Formula :: * where
 $(genSingletons[''Atom, ''Formula])
 
 data Derives :: [Formula] -> [Formula] -> * where
-  I      :: SingI a => Derives '[a] '[a]
-  Cut    :: SingI a =>
+  I      :: Seqt a => Derives '[a] '[a]
+  Cut    :: (Seqt a, Seqt gamma, Seqt sigma, Seqt delta, Seqt pi) =>
             Derives gamma (a:delta) ->
             Derives (a:sigma) pi ->
             Derives (gamma :++ sigma) (delta :++ pi)
-  LConj1 :: SingI b =>
+  LConj1 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (a:gamma) delta ->
             Derives ((And a b):gamma) delta
-  LConj2 :: SingI a =>
+  LConj2 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (b:gamma) delta ->
             Derives ((And a b):gamma) delta
-  LDisj  :: Derives (a:gamma) delta ->
+  LDisj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
+            Derives (a:gamma) delta ->
             Derives (b:sigma) pi ->
             Derives ((Or a b):(gamma :++ sigma)) (delta :++ pi)
-  LImp   :: Derives (gamma) (a:delta) ->
+  LImp   :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
+            Derives (gamma) (a:delta) ->
             Derives (b:sigma) pi ->
             Derives ((Imp a b):(gamma :++ sigma)) (delta :++ pi)
-  LNot   :: SingI a =>
+  LNot   :: (Seqt a, Seqt gamma, Seqt delta)  =>
             Derives gamma delta ->
             Derives ((Not a):gamma) delta
-  RDisj1 :: SingI b =>
+  RDisj1 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives gamma (a:delta) ->
             Derives gamma ((Or a b):delta)
-  RDisj2 :: SingI a =>
+  RDisj2 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives gamma (b:delta) ->
             Derives gamma ((Or a b):delta)
-  RConj  :: Derives gamma (a:delta) ->
+  RConj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
+            Derives gamma (a:delta) ->
             Derives sigma (b:pi) ->
             Derives (gamma :++ sigma) ((And a b):(delta :++ pi))
-  RImp   :: Derives (a:gamma) (b:delta) ->
+  RImp   :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
+            Derives (a:gamma) (b:delta) ->
             Derives gamma ((Imp a b):delta)
-  RNot   :: Derives (a:gamma) delta ->
+  RNot   :: (Seqt a, Seqt gamma, Seqt delta) =>
+            Derives (a:gamma) delta ->
             Derives gamma ((Not a):delta)
-  LW     :: SingI a =>
+  LW     :: (Seqt a, Seqt gamma, Seqt delta) =>
             Derives gamma delta ->
             Derives (a:gamma) delta
-  CL     :: Derives (a:a:gamma) delta ->
+  CL     :: (Seqt a, Seqt gamma, Seqt delta) =>
+            Derives (a:a:gamma) delta ->
             Derives (a:gamma) delta
-  PL     :: Derives (a:b:gamma) delta ->
+  PL     :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
+            Derives (a:b:gamma) delta ->
             Derives (b:a:gamma) delta
-  WR     :: Derives gamma delta ->
+  WR     :: (Seqt a, Seqt gamma, Seqt delta) =>
+            Derives gamma delta ->
             Derives gamma (a:delta)
-  CR     :: Derives gamma (a:a:delta) ->
+  CR     :: (Seqt a, Seqt gamma, Seqt delta) =>
+            Derives gamma (a:a:delta) ->
             Derives gamma (a:delta)
-  PR     :: Derives gamma (a:b:delta) ->
+  PR     :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
+            Derives gamma (a:b:delta) ->
             Derives gamma (b:a:delta)
 
-class PPT (gamma :: k) where
+class SingI gamma => Seqt (gamma :: k) where
   ppt :: Sing gamma -> String
 
-instance PPT (Var A) where
+instance Seqt (Var A) where
   ppt _ = "A"
 
-instance PPT (Var B) where
+instance Seqt (Var B) where
   ppt _ = "B"
 
-instance PPT (Var C) where
+instance Seqt (Var C) where
   ppt _ = "C"
 
-instance PPT a => PPT (Not a) where
+instance Seqt a => Seqt (Not a) where
   ppt (SNot a) = "~" ++ ppt a
 
-instance (PPT a, PPT b) => PPT (And a b) where
+instance (Seqt a, Seqt b) => Seqt (And a b) where
   ppt (SAnd a b) = ppt a ++ " /\\ " ++ ppt b
 
-instance (PPT a, PPT b) => PPT (Or a b) where
+instance (Seqt a, Seqt b) => Seqt (Or a b) where
   ppt (SOr a b) = ppt a ++ " \\/ " ++ ppt b
 
-instance (PPT a, PPT b) => PPT (Imp a b) where
+instance (Seqt a, Seqt b) => Seqt (Imp a b) where
   ppt (SImp a b) = ppt a ++ " -> " ++ ppt b
 
-instance PPT ('[]) where
-  ppt (S.SNil)       = "empty"
+instance Seqt ('[]) where
+  ppt (S.SNil)       = ""
 
-instance (PPT a, PPT as) => PPT (a ': as) where
+instance (Seqt a, Seqt as) => Seqt (a ': as) where
   ppt (S.SCons a S.SNil) = ppt a
   ppt (S.SCons a as)     = (ppt a) ++ ", " ++ (ppt as)
 
-pp :: forall gamma delta. (PPT gamma, SingI gamma, PPT delta, SingI delta) =>
-  Derives gamma delta -> String
-pp theorem = g ++ " |- " ++ d where
+pp :: forall gamma delta. (Seqt gamma, Seqt delta) =>
+  Derives gamma delta -> ProofTree
+pp theorem = l $ g ++ " |- " ++ d
+  where
+  l x = pNode x xs
+  xs = case theorem of
+    I         -> []
+    Cut a b   -> [pp a,  pp b]
+    LConj1 a  -> [pp a]
+    LConj2 a  -> [pp a]
+    LDisj a b -> [pp a, pp b]
+    LImp a b  -> [pp a, pp b]
+    LNot a    -> [pp a]
+    RDisj1 a  -> [pp a]
+    RDisj2 a  -> [pp a]
+    RConj a b -> [pp a, pp b]
+    RImp a    -> [pp a]
+    RNot a    -> [pp a]
+    LW a      -> [pp a]
+    CL a      -> [pp a]
+    PL a      -> [pp a]
+    WR a      -> [pp a]
+    CR a      -> [pp a]
+    PR a      -> [pp a]
   g = ppt (sing :: Sing gamma)
   d = ppt (sing :: Sing delta)
-
-type Sequent = ([Formula], [Formula])
-
-va = SVar SA
-vb = SVar SB
-vc = SVar SC
-neg = SNot
 
 simple :: Derives '[Var A] '[Var A]
 simple = I
@@ -134,24 +159,3 @@ excludedMiddle = CR . RDisj1 . PR . RDisj2 . RNot $ I
 disjComm :: Derives '[] '[Imp (Or (Var A) (Var B))
                            (Or (Var B) (Var A))]
 disjComm = RImp (CR (LDisj (RDisj2 I) (RDisj1 I)))
-
-printExcludedMiddle :: IO (Derives '[] '[Or (Var A) (Not (Var A))])
-printExcludedMiddle = let a = I
-                          b = RNot a
-                          c = RDisj2 b
-                          d = PR c
-                          e = RDisj1 d
-                          f = CR e in
-                        putStrLn "------------" >>
-                        putStrLn (pp a) >>
-                        putStrLn "------------" >>
-                        putStrLn (pp b) >>
-                        putStrLn "------------" >>
-                        putStrLn (pp c) >>
-                        putStrLn "------------" >>
-                        putStrLn (pp d) >>
-                        putStrLn "------------" >>
-                        putStrLn (pp e) >>
-                        putStrLn "------------" >>
-                        putStrLn (pp f) >>
-                        return f
