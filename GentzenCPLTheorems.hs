@@ -9,7 +9,7 @@ import ProofTree
 simple :: Derives '[Var A] '[Var A]
 simple = I
 
-empDerTr :: Derives '[] '[Truth]
+empDerTr :: Derives '[] '[Top]
 empDerTr = T
 
 flipCtx :: (Seqt a, Seqt b, Seqt c, Seqt d) =>
@@ -31,7 +31,7 @@ derMorIntP :: forall p q. (Seqt p, Seqt q) =>
   Derives '[Not (Or p q)] '[And (Not p) (Not q)]
 derMorIntP = LNot (CR f) where
   f :: Derives '[] '[Or p q, Or p q, And (Not p) (Not q)]
-  f = PR I I (T :: Derives '[Or p q] '[Truth]) T $ flipDer g
+  f = PR I I (T :: Derives '[Or p q] '[Top]) T $ flipDer g
   g :: Derives '[] '[And (Not p) (Not q), Or p q, Or p q]
   g = RConj (flipDer . RDisj1 . flipDer . RNot $ I)
       (flipDer . RDisj2 . flipDer . RNot $ I)

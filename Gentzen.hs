@@ -19,7 +19,8 @@ data Atom :: * where
   deriving (Show, Eq)
 
 data Formula :: * where
-  Truth :: Formula
+  Top    :: Formula
+  Bottom :: Formula
   Not :: Formula -> Formula
   And :: Formula -> Formula -> Formula
   Or  :: Formula -> Formula -> Formula
@@ -41,15 +42,27 @@ instance Seqt (Var B) where
 instance Seqt (Var C) where
   ppt _ = "C"
 
+instance Seqt Top where
+  ppt _ = "⊤"
+
+instance Seqt Bottom where
+  ppt _ = "⊥"
+
 instance Seqt a => Seqt (Not a) where
   ppt (SNot a@(SVar _)) = "~" ++ ppt a
   ppt (SNot a)          = "~(" ++ ppt a ++ ")"
 
 instance (Seqt a, Seqt b) => Seqt (And a b) where
-  ppt (SAnd a b) = ppt a ++ " /\\ " ++ ppt b
+  ppt (SAnd a b@(SVar _)) = ppt a ++ " /\\ " ++ ppt b
+  ppt (SAnd a STop) = ppt a ++ " /\\ " ++ ppt STop
+  ppt (SAnd a SBottom) = ppt a ++ " /\\ " ++ ppt SBottom
+  ppt (SAnd a b) = ppt a ++ " /\\ (" ++ ppt b ++ ")"
 
 instance (Seqt a, Seqt b) => Seqt (Or a b) where
-  ppt (SOr a b) = ppt a ++ " \\/ " ++ ppt b
+  ppt (SOr a b@(SVar _)) = ppt a ++ " \\/ " ++ ppt b
+  ppt (SOr a STop) = ppt a ++ " \\/ " ++ ppt STop
+  ppt (SOr a SBottom) = ppt a ++ " \\/ " ++ ppt SBottom
+  ppt (SOr a b) = ppt a ++ " \\/ (" ++ ppt b ++ ")"
 
 instance (Seqt a, Seqt b) => Seqt (Imp a b) where
   ppt (SImp a b) = ppt a ++ " -> " ++ ppt b

@@ -11,10 +11,9 @@ import           Data.Singletons
 import           Data.Singletons.Prelude.List ((:++))
 import           Gentzen
 import           ProofTree
-import           Text.PrettyPrint
 
 data Derives :: [Formula] -> [Formula] -> * where
-  T      :: Seqt gamma => Derives gamma '[Truth]
+  T      :: Seqt gamma => Derives gamma '[Top]
   I      :: Seqt a => Derives '[a] '[a]
   Cut    :: (Seqt a, Seqt gamma, Seqt sigma, Seqt delta, Seqt pi) =>
             Derives gamma (a:delta) ->
@@ -29,14 +28,14 @@ data Derives :: [Formula] -> [Formula] -> * where
   LDisj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
             Derives (a:gamma) delta ->
             Derives (b:sigma) pi ->
-            Derives ((Or a b):(gamma :++ sigma)) (delta :++ pi)
+            Derives (Or a b:(gamma :++ sigma)) (delta :++ pi)
   LImp   :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
-            Derives (gamma) (a:delta) ->
+            Derives gamma (a:delta) ->
             Derives (b:sigma) pi ->
-            Derives ((Imp a b):(gamma :++ sigma)) (delta :++ pi)
+            Derives (Imp a b:(gamma :++ sigma)) (delta :++ pi)
   LNot   :: (Seqt a, Seqt gamma, Seqt delta)  =>
             Derives gamma (a:delta) ->
-            Derives ((Not a):gamma) delta
+            Derives (Not a:gamma) delta
   RDisj1 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives gamma (a:delta) ->
             Derives gamma ((Or a b):delta)
@@ -63,8 +62,8 @@ data Derives :: [Formula] -> [Formula] -> * where
              Seqt (sigma :++ a:b:gamma)) =>
             Derives '[a] '[a] ->
             Derives '[b] '[b] ->
-            Derives sigma '[Truth] ->
-            Derives gamma '[Truth] ->
+            Derives sigma '[Top] ->
+            Derives gamma '[Top] ->
             Derives (sigma :++ a:b:gamma) delta ->
             Derives (sigma :++ b:a:gamma) delta
   WR     :: (Seqt a, Seqt gamma, Seqt delta) =>
@@ -77,8 +76,8 @@ data Derives :: [Formula] -> [Formula] -> * where
              Seqt (sigma :++ a:b:gamma)) =>
             Derives '[a] '[a] ->
             Derives '[b] '[b] ->
-            Derives sigma '[Truth] ->
-            Derives gamma '[Truth] ->
+            Derives sigma '[Top] ->
+            Derives gamma '[Top] ->
             Derives delta (sigma :++ a:b:gamma) ->
             Derives delta (sigma :++ b:a:gamma)
 
