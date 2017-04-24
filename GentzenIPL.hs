@@ -7,7 +7,7 @@
 
 module GentzenIPL where
 
-import           Data.Singletons
+import           Data.Singletons              (Sing, sing)
 import           Data.Singletons.Prelude.List ((:++))
 import           Gentzen
 import           ProofTree
@@ -20,31 +20,31 @@ data Derives :: [Formula] -> Formula -> * where
   I      :: Seqt a => Derives '[a] a
   LConj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (a:b:gamma) delta ->
-            Derives (And a b:gamma) delta
+            Derives (a /\ b:gamma) delta
   LDisj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (a:gamma) delta ->
             Derives (b:gamma) delta ->
-            Derives (Or a b:gamma) delta
+            Derives (a \/ b:gamma) delta
   LImp   :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives gamma a ->
             Derives (b:gamma) delta ->
-            Derives (Imp a b:gamma) delta
+            Derives (a ~> b:gamma) delta
   LNot   :: (Seqt a, Seqt gamma) =>
             Derives gamma a ->
             Derives (Not a:gamma) Bottom
   RDisj1 :: (Seqt a, Seqt b, Seqt gamma) =>
             Derives gamma a ->
-            Derives gamma (Or a b)
+            Derives gamma (a \/ b)
   RDisj2 :: (Seqt a, Seqt b, Seqt gamma) =>
             Derives gamma b ->
-            Derives gamma (Or a b)
+            Derives gamma (a \/ b)
   RConj  :: (Seqt a, Seqt b, Seqt gamma) =>
             Derives gamma a ->
             Derives gamma b ->
-            Derives gamma (And a b)
+            Derives gamma (a /\ b)
   RImp   :: (Seqt a, Seqt b, Seqt gamma) =>
             Derives (a:gamma) b ->
-            Derives gamma (Imp a b)
+            Derives gamma (a ~> b)
   RNot   :: (Seqt a, Seqt gamma) =>
             Derives (a:gamma) Bottom ->
             Derives gamma (Not a)

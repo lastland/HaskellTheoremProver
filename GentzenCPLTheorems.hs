@@ -6,7 +6,7 @@ import Gentzen
 import GentzenCPL
 import ProofTree
 
-simple :: Derives '[Var A] '[Var A]
+simple :: Derives '[VA] '[VA]
 simple = I
 
 empDerTr :: Derives '[] '[Top]
@@ -28,29 +28,28 @@ doubNegP1 = LNot $ RNot I
 -- notTandFP = undefined
 
 derMorIntP :: forall p q. (Seqt p, Seqt q) =>
-  Derives '[Not (Or p q)] '[And (Not p) (Not q)]
+  Derives '[Not (p \/ q)] '[Not p /\ Not q]
 derMorIntP = LNot (CR f) where
-  f :: Derives '[] '[Or p q, Or p q, And (Not p) (Not q)]
-  f = PR I I (T :: Derives '[Or p q] '[Top]) T $ flipDer g
-  g :: Derives '[] '[And (Not p) (Not q), Or p q, Or p q]
+  f :: Derives '[] '[p \/ q, p \/ q, Not p /\ Not q]
+  f = PR I I (T :: Derives '[p \/ q] '[Top]) T $ flipDer g
+  g :: Derives '[] '[Not p /\ Not q, p \/ q, p \/ q]
   g = RConj (flipDer . RDisj1 . flipDer . RNot $ I)
       (flipDer . RDisj2 . flipDer . RNot $ I)
 
-derMorIntA :: Derives '[Not (Or (Var A) (Var B))]
-  '[And (Not (Var A)) (Not (Var B))]
+derMorIntA :: Derives '[Not (VA \/ VB)] '[Not VA /\ Not VB]
 derMorIntA = derMorIntP
 
 --notTandFA :: Derives '[And p (Not p)] '[p]
 --notTandFA = undefined
 
-excludedMiddleP :: Seqt a => Derives '[] '[Or a (Not a)]
+excludedMiddleP :: Seqt a => Derives '[] '[a \/ Not a]
 excludedMiddleP = CR . RDisj1 . flipDer . RDisj2 . RNot $ I
 
-excludedMiddleA :: Derives '[] '[Or (Var A) (Not (Var A))]
+excludedMiddleA :: Derives '[] '[VA \/ Not VA]
 excludedMiddleA = excludedMiddleP
 
-disjCommP :: (Seqt p, Seqt q) => Derives '[Or p q] '[Or q p]
+disjCommP :: (Seqt p, Seqt q) => Derives '[p \/ q] '[q \/ p]
 disjCommP = CR (LDisj (RDisj2 I) (RDisj1 I))
 
-disjCommA :: Derives '[Or (Var A) (Var B)] '[Or (Var B) (Var A)]
+disjCommA :: Derives '[VA \/ VB] '[VB \/ VA]
 disjCommA = disjCommA

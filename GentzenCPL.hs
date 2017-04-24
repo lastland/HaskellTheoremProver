@@ -7,7 +7,7 @@
 
 module GentzenCPL where
 
-import           Data.Singletons
+import           Data.Singletons              (Sing, sing)
 import           Data.Singletons.Prelude.List ((:++))
 import           Gentzen
 import           ProofTree
@@ -21,37 +21,37 @@ data Derives :: [Formula] -> [Formula] -> * where
             Derives (gamma :++ sigma) (delta :++ pi)
   LConj1 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (a:gamma) delta ->
-            Derives ((And a b):gamma) delta
+            Derives (a /\ b:gamma) delta
   LConj2 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (b:gamma) delta ->
-            Derives ((And a b):gamma) delta
+            Derives (a /\ b:gamma) delta
   LDisj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
             Derives (a:gamma) delta ->
             Derives (b:sigma) pi ->
-            Derives (Or a b:(gamma :++ sigma)) (delta :++ pi)
+            Derives (a \/ b:(gamma :++ sigma)) (delta :++ pi)
   LImp   :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
             Derives gamma (a:delta) ->
             Derives (b:sigma) pi ->
-            Derives (Imp a b:(gamma :++ sigma)) (delta :++ pi)
+            Derives (a ~> b:(gamma :++ sigma)) (delta :++ pi)
   LNot   :: (Seqt a, Seqt gamma, Seqt delta)  =>
             Derives gamma (a:delta) ->
             Derives (Not a:gamma) delta
   RDisj1 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives gamma (a:delta) ->
-            Derives gamma ((Or a b):delta)
+            Derives gamma (a \/ b:delta)
   RDisj2 :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives gamma (b:delta) ->
-            Derives gamma ((Or a b):delta)
+            Derives gamma (a \/ b:delta)
   RConj  :: (Seqt a, Seqt b, Seqt gamma, Seqt delta, Seqt sigma, Seqt pi) =>
             Derives gamma (a:delta) ->
             Derives sigma (b:pi) ->
-            Derives (gamma :++ sigma) ((And a b):(delta :++ pi))
+            Derives (gamma :++ sigma) (a /\ b:(delta :++ pi))
   RImp   :: (Seqt a, Seqt b, Seqt gamma, Seqt delta) =>
             Derives (a:gamma) (b:delta) ->
-            Derives gamma ((Imp a b):delta)
+            Derives gamma (a ~> b:delta)
   RNot   :: (Seqt a, Seqt gamma, Seqt delta) =>
             Derives (a:gamma) delta ->
-            Derives gamma ((Not a):delta)
+            Derives gamma (Not a:delta)
   LW     :: (Seqt a, Seqt gamma, Seqt delta) =>
             Derives gamma delta ->
             Derives (a:gamma) delta

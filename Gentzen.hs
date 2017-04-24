@@ -30,6 +30,14 @@ data Formula :: * where
 
 $(genSingletons[''Atom, ''Formula])
 
+type (/\) = And
+type (\/) = Or
+type (~>) = Imp
+
+type VA = Var A
+type VB = Var B
+type VC = Var C
+
 class SingI gamma => Seqt (gamma :: k) where
   ppt :: Sing gamma -> String
 
