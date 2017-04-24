@@ -16,6 +16,15 @@ flipCtx :: (Seqt a, Seqt b, Seqt c, Seqt d) =>
   Derives (a ': b ': c) d -> Derives (b ': a ': c) d
 flipCtx = PL I I empDerTr T
 
+_notTandF :: (Seqt p, Seqt q) => Derives '[p, Not p] q
+_notTandF = flipCtx . F $ LNot I
+
+notTandF :: (Seqt p, Seqt q) => Derives '[p /\ Not p] q
+notTandF = LConj _notTandF
+
+notTandF' :: Derives '[VA /\ Not VA] VB
+notTandF' = notTandF
+
 andFlip :: (Seqt p, Seqt q) => Derives '[p /\ q] (q /\ p)
 andFlip = RConj (LConj $ LW I) (LConj $ flipCtx $ LW I)
 
@@ -45,3 +54,40 @@ distr2 = LDisj (LConj a) (LConj b) where
 
 distr2' :: Derives '[(VA /\ VB) \/ (VA /\ VC)] (VA /\ (VB \/ VC))
 distr2' = distr2
+
+impTrans :: forall p q r .(Seqt p, Seqt q, Seqt r) =>
+  Derives '[p ~> (q ~> r), p ~> q] (p ~> r)
+impTrans = flipCtx . RImp . flipCtx $ LImp (flipCtx $ LW I) f where
+  f :: Derives '[q, p, p ~> (q ~> r)] r
+  f = PL I I (T :: Derives '[q] Top) T . flipCtx $ LImp (LW I) g
+  g :: Derives '[q ~> r, q, p] r
+  g = LImp (flipCtx $ LW I)
+      (flipCtx . PL I I (T :: Derives '[q] Top) T . LW $ LW I)
+
+impTrans' :: Derives '[VA ~> (VB ~> VC), VA ~> VB] (VA ~> VC)
+impTrans' = impTrans
+
+doubleNegImp :: Seqt p => Derives '[p] (Not (Not p))
+doubleNegImp = RNot $ LNot I
+
+doubleNegImp' :: Derives '[VA] (Not (Not VA))
+doubleNegImp' = doubleNegImp
+
+derMorgan1 :: (Seqt p, Seqt q) =>
+  Derives '[Not (p \/ q)] (Not p /\ Not q)
+derMorgan1 = RConj (RNot . flipCtx . LNot $ RDisj1 I)
+            (RNot . flipCtx . LNot $ RDisj2 I)
+
+derMorgan1' :: Derives '[Not (VA \/ VB)] (Not VA /\ Not VB)
+derMorgan1' = derMorgan1
+
+derMorgan2 :: forall p q .(Seqt p, Seqt q) =>
+  Derives '[Not p /\ Not q] (Not (p \/ q))
+derMorgan2 = LConj . RNot $ LDisj f g where
+  f :: Derives '[p, Not p, Not q] Bottom
+  f = PL I I (T :: Derives '[p] Top) T . flipCtx $ LW _notTandF
+  g :: Derives '[q, Not p, Not q] Bottom
+  g = flipCtx $ LW _notTandF
+
+derMorgan2' :: Derives '[Not VA /\ Not VB] (Not (VA \/ VB))
+derMorgan2' = derMorgan2
