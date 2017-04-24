@@ -71,6 +71,7 @@ pp theorem = l $ g ++ " |- " ++ d
   l x = pNode x xs
   xs = case theorem of
     I            -> []
+    F a          -> [pp a]
     LConj a      -> [pp a]
     LDisj a b    -> [pp a, pp b]
     LImp a b     -> [pp a, pp b]
