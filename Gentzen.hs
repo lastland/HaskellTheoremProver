@@ -57,23 +57,16 @@ instance Seqt Bottom where
   ppt _ = "⊥"
 
 instance Seqt a => Seqt (Not a) where
-  ppt (SNot a@(SVar _)) = "~" ++ ppt a
-  ppt (SNot a)          = "~(" ++ ppt a ++ ")"
+  ppt e@(SNot a) = "~" ++ lp a e ++ ""
 
 instance (Seqt a, Seqt b) => Seqt (And a b) where
-  ppt (SAnd a b@(SVar _)) = ppt a ++ " /\\ " ++ ppt b
-  ppt (SAnd a STop) = ppt a ++ " /\\ " ++ ppt STop
-  ppt (SAnd a SBottom) = ppt a ++ " /\\ " ++ ppt SBottom
-  ppt (SAnd a b) = ppt a ++ " /\\ (" ++ ppt b ++ ")"
+  ppt e@(SAnd a b) = lp a e ++ " /\\ " ++ lp b e where
 
 instance (Seqt a, Seqt b) => Seqt (Or a b) where
-  ppt (SOr a b@(SVar _)) = ppt a ++ " \\/ " ++ ppt b
-  ppt (SOr a STop) = ppt a ++ " \\/ " ++ ppt STop
-  ppt (SOr a SBottom) = ppt a ++ " \\/ " ++ ppt SBottom
-  ppt (SOr a b) = ppt a ++ " \\/ (" ++ ppt b ++ ")"
+  ppt e@(SOr a b) = lp a e ++ " \\/ " ++ lp b e
 
 instance (Seqt a, Seqt b) => Seqt (Imp a b) where
-  ppt (SImp a b) = ppt a ++ " -> " ++ ppt b
+  ppt e@(SImp a b) = lp a e ++ " -> " ++ lp b e
 
 instance Seqt ('[]) where
   ppt (S.SNil)       = ""
@@ -81,3 +74,19 @@ instance Seqt ('[]) where
 instance (Seqt a, Seqt as) => Seqt (a ': as) where
   ppt (S.SCons a S.SNil) = ppt a
   ppt (S.SCons a as)     = (ppt a) ++ ", " ++ (ppt as)
+
+level :: forall (a :: Formula). Seqt a => Sing a -> Int
+level (SVar _)   = 100
+level STop       = 100
+level SBottom    = 100
+level (SNot _)   = 10
+level (SAnd _ _) = 8
+level (SOr  _ _) = 5
+level (SImp _ _) = 2
+
+lp :: forall (a :: Formula) (b :: Formula). (Seqt a, Seqt b) =>
+      Sing a -> Sing b -> String
+lp x e = (if level x < level e then parens else id) (ppt x)
+
+parens :: String -> String
+parens s = "(" ++ s ++ ")"
