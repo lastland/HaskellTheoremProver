@@ -1,10 +1,12 @@
+{-# LANGUAGE DataKinds           #-}
 {-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeOperators       #-}
 
 module GentzenCPLTheorems where
 
-import Gentzen
-import GentzenCPL
-import ProofTree
+import           Gentzen
+import           GentzenCPL
+import           ProofTree
 
 simple :: Derives '[VA] '[VA]
 simple = I
