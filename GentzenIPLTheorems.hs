@@ -59,10 +59,12 @@ impTrans :: forall p q r .(Seqt p, Seqt q, Seqt r) =>
   Derives '[p ~> (q ~> r), p ~> q] (p ~> r)
 impTrans = flipCtx . RImp . flipCtx $ LImp (flipCtx $ LW I) f where
   f :: Derives '[q, p, p ~> (q ~> r)] r
-  f = PL I I (T :: Derives '[q] Top) T . flipCtx $ LImp (LW I) g
+  f = PL I I t T . flipCtx $ LImp (LW I) g
   g :: Derives '[q ~> r, q, p] r
   g = LImp (flipCtx $ LW I)
-      (flipCtx . PL I I (T :: Derives '[q] Top) T . LW $ LW I)
+      (flipCtx . PL I I t T . LW $ LW I)
+  t :: Derives '[q] Top
+  t = T
 
 impTrans' :: Derives '[VA ~> (VB ~> VC), VA ~> VB] (VA ~> VC)
 impTrans' = impTrans
