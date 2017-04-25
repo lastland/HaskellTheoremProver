@@ -7,5 +7,5 @@ type ProofTree = Tree String
 
 pNode = Node
 
-printTree :: ProofTree -> String
-printTree = drawVerticalTreeWith 5
+printTree :: ProofTree -> IO ()
+printTree = putStrLn . drawVerticalTreeWith 5
