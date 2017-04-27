@@ -1,15 +1,15 @@
-module FunImpl.NDedFun (Sequent, Pf,
-                        Formula(Bot, Var, And, Or, Imp),
-                        ax, wkn,
-                        andI, andE1, andE2,
-                        orI1, orI2, orE,
-                        impI, impE, botEInt, botECl,
-                        axP, wknP,
-                        andIP, andEP1, andEP2,
-                        orIP1, orIP2, orEP,
-                        impIP, impEP, botEIntP, botEClP,
-                        (/\), (\/), (~>),
-                        isAtomic, ctxt, thes) where
+module FunImpl.NDed (Sequent, Pf,
+                     Formula(Bot, Var, And, Or, Imp),
+                     ax, wkn,
+                     andI, andE1, andE2,
+                     orI1, orI2, orE,
+                     impI, impE, botEInt, botECl,
+                     axP, wknP,
+                     andIP, andEP1, andEP2,
+                     orIP1, orIP2, orEP,
+                     impIP, impEP, botEIntP, botEClP,
+                     (/\), (\/), (~>),
+                     isAtomic, ctxt, thes) where
 
 import           Data.List      (intercalate)
 import           Data.Set       hiding (map)
@@ -76,53 +76,29 @@ instance PP Sequent where
         --Intuitionistic functions
 -------------------------------------------------------------------------------
 
-type Pf = Proof.Proof Maybe Sequent
-
 ax :: Formula -> Set Formula -> Maybe Sequent
 ax f ctx | member f ctx = Just (Seq ctx f)
          | otherwise    = Nothing
 
-axP :: Formula -> Set Formula -> Pf
-axP f ctx = lift (ax f ctx)
-
 wkn :: Formula -> Sequent -> Maybe Sequent
 wkn p (Seq ctx th) = Just (Seq (insert p ctx) th)
-
-wknP :: Formula -> Pf -> Pf
-wknP p = lift1 (wkn p)
 
 andI :: Sequent -> Sequent -> Maybe Sequent
 andI (Seq ctx1 th1) (Seq ctx2 th2) | ctx1 == ctx2 = Just (Seq ctx1 (th1 /\ th2))
                                    | otherwise    = Nothing
-
-andIP :: Pf -> Pf -> Pf
-andIP = lift2 andI
-
 andE1 :: Sequent -> Maybe Sequent
 andE1 (Seq ctx (And f1 _)) = Just (Seq ctx f1)
 andE1 _                    = Nothing
-
-andEP1 :: Pf -> Pf
-andEP1 = lift1 andE1
 
 andE2 :: Sequent -> Maybe Sequent
 andE2 (Seq ctx (And _ f2)) = Just (Seq ctx f2)
 andE2 _                    = Nothing
 
-andEP2 :: Pf -> Pf
-andEP2 = lift1 andE2
-
 orI1 :: Formula -> Sequent -> Maybe Sequent
 orI1 f2 (Seq ctx f1) = Just (Seq ctx (f1 \/ f2))
 
-orIP1 :: Formula -> Pf -> Pf
-orIP1 = lift1 . orI1
-
 orI2 :: Formula -> Sequent -> Maybe Sequent
 orI2 f1 (Seq ctx f2) = Just (Seq ctx (f1 \/ f2))
-
-orIP2 :: Formula -> Pf -> Pf
-orIP2 = lift1 . orI2
 
 orE :: Sequent -> Sequent -> Sequent -> Maybe Sequent
 orE (Seq ctx1 th1) (Seq ctx2 th2) (Seq ctx3 (Or f1 f2))
@@ -132,16 +108,10 @@ orE (Seq ctx1 th1) (Seq ctx2 th2) (Seq ctx3 (Or f1 f2))
     | otherwise                       = Nothing
 orE _ _ _                             = Nothing
 
-orEP :: Pf -> Pf -> Pf -> Pf
-orEP = lift3 orE
-
 impI :: Formula -> Sequent -> Maybe Sequent
 impI f1 (Seq ctx f)
         | member f1 ctx   = Just (Seq (delete f1 ctx) (f1 ~> f))
         | otherwise       = Nothing
-
-impIP :: Formula -> Pf -> Pf
-impIP f1 = lift1 (impI f1)
 
 impE :: Sequent -> Sequent -> Maybe Sequent
 impE (Seq ctx1 (Imp f1 f2)) (Seq ctx2 f)
@@ -149,12 +119,45 @@ impE (Seq ctx1 (Imp f1 f2)) (Seq ctx2 f)
      | otherwise                   = Nothing
 impE _ _                           = Nothing
 
-impEP :: Pf -> Pf -> Pf
-impEP = lift2 impE
-
 botEInt :: Formula -> Sequent -> Maybe Sequent
 botEInt f (Seq ctx Bot) = Just (Seq ctx f)
 botEInt _ _             = Nothing
+
+-------------------------------------------------------------------------------
+        --Intuitionistic functions (carried with proofs)
+-------------------------------------------------------------------------------
+
+type Pf = Proof.Proof Maybe Sequent
+
+axP :: Formula -> Set Formula -> Pf
+axP f ctx = lift (ax f ctx)
+
+wknP :: Formula -> Pf -> Pf
+wknP p = lift1 (wkn p)
+
+andIP :: Pf -> Pf -> Pf
+andIP = lift2 andI
+
+andEP1 :: Pf -> Pf
+andEP1 = lift1 andE1
+
+andEP2 :: Pf -> Pf
+andEP2 = lift1 andE2
+
+orIP1 :: Formula -> Pf -> Pf
+orIP1 = lift1 . orI1
+
+orIP2 :: Formula -> Pf -> Pf
+orIP2 = lift1 . orI2
+
+orEP :: Pf -> Pf -> Pf -> Pf
+orEP = lift3 orE
+
+impIP :: Formula -> Pf -> Pf
+impIP f1 = lift1 (impI f1)
+
+impEP :: Pf -> Pf -> Pf
+impEP = lift2 impE
 
 botEIntP :: Formula -> Pf -> Pf
 botEIntP = lift1 . botEInt
@@ -168,6 +171,10 @@ botECl f (Seq ctx Bot)
        | member (f ~> Bot) ctx = Just (Seq (delete (f ~> Bot) ctx) f)
        | otherwise             = Nothing
 botECl _ _                     = Nothing
+
+------------------------------------------------------------------------
+        --Classical function (carried with proofs)
+------------------------------------------------------------------------
 
 botEClP :: Formula -> Pf -> Pf
 botEClP = lift1 . botECl
