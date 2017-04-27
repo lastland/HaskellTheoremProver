@@ -107,3 +107,4 @@ pp theorem = l $ g ++ (if null g then "" else " ") ++ "|- " ++ d
     PR _ _ _ _ a -> [pp a]
   g = ppt (sing :: Sing gamma)
   d = ppt (sing :: Sing delta)
+
