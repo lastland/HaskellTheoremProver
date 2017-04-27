@@ -1,6 +1,6 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module NatDedFunTheorems where
+module NDedFunTheorems where
 
 import           Data.Set         hiding (map)
 import           NatDedFun

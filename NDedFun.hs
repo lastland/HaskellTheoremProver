@@ -1,14 +1,13 @@
-module NatDedFun (Sequent, Pf,
-                  Formula(Bot, Var, And, Or, Imp),
-                  ax, andI, andE1, andE2,
-                  orI1, orI2, orE,
-                  impI, impE, botEInt, botECl,
-                  axP, andIP, andEP1, andEP2,
-                  orIP1, orIP2, orEP,
-                  impIP, impEP, botEIntP, botEClP,
-
-                  (/\), (\/), (~>),
-                  isAtomic, ctxt, thes) where
+module NDedFun (Sequent, Pf,
+                Formula(Bot, Var, And, Or, Imp),
+                ax, andI, andE1, andE2,
+                orI1, orI2, orE,
+                impI, impE, botEInt, botECl,
+                axP, andIP, andEP1, andEP2,
+                orIP1, orIP2, orEP,
+                impIP, impEP, botEIntP, botEClP,
+                (/\), (\/), (~>),
+                isAtomic, ctxt, thes) where
 
 import           Data.List (intercalate)
 import           Data.Set  hiding (map)
