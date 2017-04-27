@@ -249,7 +249,9 @@ $$\infer[(\vee \text{I}1)]{\Gamma \vdash \phi_1 \vee \phi_2}{\Gamma \vdash \phi_
 
 \begin{frame}
 \frametitle{\centerline{Derivation and Evidence in one go}}
-\centerline{\texttt{distr :: Derives '[Formula (p :$\wedge$: (q :$\vee$: r))] ->}} \centerline{\texttt{(Formula ((p :$\wedge$ r) :$\vee$: (q :$\wedge$: r)))}}
+\centerline{\texttt{distr :: Derives '[Formula (p :$\wedge$: (q :$\vee$: r))] ->}}
+
+\centerline{\texttt{(Formula ((p :$\wedge$ r) :$\vee$: (q :$\wedge$: r)))}}
 \pause
 \vspace{20pt}
 \begin{itemize}
