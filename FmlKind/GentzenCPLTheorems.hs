@@ -6,7 +6,7 @@ module FmlKind.GentzenCPLTheorems where
 
 import           FmlKind.Gentzen
 import           FmlKind.GentzenCPL
-import           ProofTree
+import           Printing.ProofTree
 
 simple :: Derives '[VA] '[VA]
 simple = I

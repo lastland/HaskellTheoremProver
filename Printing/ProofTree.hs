@@ -8,7 +8,7 @@ type ProofTree = Tree String
 pNode = Node
 
 showTree :: ProofTree -> String
-showTree = drawVerticalTreeWith 5
+showTree = drawVerticalTreeWith 3
 
 showMaybeTree :: Maybe ProofTree -> String
 showMaybeTree (Just t) = showTree t

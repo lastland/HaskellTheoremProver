@@ -1,3 +1,5 @@
+module FunImpl.NDedTests where
+
 import           FunImpl.NDed
 import           FunImpl.NDedTheorems
 import           Printing.Proof

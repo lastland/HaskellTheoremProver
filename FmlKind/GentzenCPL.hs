@@ -9,7 +9,7 @@ module FmlKind.GentzenCPL where
 
 import           Data.Singletons              (Sing, sing)
 import           Data.Singletons.Prelude.List ((:++))
-import           Gentzen
+import           FmlKind.Gentzen
 import           Printing.ProofTree
 
 data Derives :: [Formula] -> [Formula] -> * where

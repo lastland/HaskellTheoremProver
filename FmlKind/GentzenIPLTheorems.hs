@@ -77,21 +77,21 @@ doubleNegImp = RNot $ LNot I
 doubleNegImp' :: Derives '[VA] (Not (Not VA))
 doubleNegImp' = doubleNegImp
 
-derMorgan1 :: (Seqt p, Seqt q) =>
+deMorgan1 :: (Seqt p, Seqt q) =>
   Derives '[Not (p \/ q)] (Not p /\ Not q)
-derMorgan1 = RConj (RNot . flipCtx . LNot $ RDisj1 I)
+deMorgan1 = RConj (RNot . flipCtx . LNot $ RDisj1 I)
             (RNot . flipCtx . LNot $ RDisj2 I)
 
-derMorgan1' :: Derives '[Not (VA \/ VB)] (Not VA /\ Not VB)
-derMorgan1' = derMorgan1
+deMorgan1' :: Derives '[Not (VA \/ VB)] (Not VA /\ Not VB)
+deMorgan1' = deMorgan1
 
-derMorgan2 :: forall p q .(Seqt p, Seqt q) =>
+deMorgan2 :: forall p q .(Seqt p, Seqt q) =>
   Derives '[Not p /\ Not q] (Not (p \/ q))
-derMorgan2 = LConj . RNot $ LDisj f g where
+deMorgan2 = LConj . RNot $ LDisj f g where
   f :: Derives '[p, Not p, Not q] Bottom
   f = PL I I (T :: Derives '[p] Top) T . flipCtx $ LW _notTandF
   g :: Derives '[q, Not p, Not q] Bottom
   g = flipCtx $ LW _notTandF
 
-derMorgan2' :: Derives '[Not VA /\ Not VB] (Not (VA \/ VB))
-derMorgan2' = derMorgan2
+deMorgan2' :: Derives '[Not VA /\ Not VB] (Not (VA \/ VB))
+deMorgan2' = deMorgan2
