@@ -24,23 +24,29 @@ import qualified Printing.Proof             as Proof
 import           Printing.ProofTree         (ProofTree, printTree, showTheorem)
 import qualified Printing.ProofTree         as ProofTree
 
+data Logic = Classic | Intuition
+
+instance Show Logic where
+  show Classic   = "classical logic"
+  show Intuition = "intuitionistic logic"
+
 -- Data-level theorems with proofs in natural deductions.
-nDedProofs :: [ProofTree]
-nDedProofs = mapMaybe getTree
-             [FNDedTheorems.andFlip a b,
-              FNDedTheorems.orFlip a b,
-              FNDedTheorems.distr1 a b c,
-              FNDedTheorems.distr2 a b c,
-              FNDedTheorems.deMorgOr a b,
-              FNDedTheorems.impOr a b,
-              FNDedTheorems.tranApp a b c,
-              FNDedTheorems.doubNegImp a,
-              FNDedTheorems.wkPeirce a b,
-              FNDedTheorems.lem a,
-              FNDedTheorems.doubNegElim a,
-              FNDedTheorems.deMorgAnd a b,
-              FNDedTheorems.orImp a b,
-              FNDedTheorems.peirceL a b] where
+nDedProofs :: [(ProofTree, Logic)]
+nDedProofs = mapMaybe (\(x, y) -> flip (,) y <$> getTree x)
+             [(FNDedTheorems.andFlip a b, Intuition),
+              (FNDedTheorems.orFlip a b, Intuition),
+              (FNDedTheorems.distr1 a b c, Intuition),
+              (FNDedTheorems.distr2 a b c, Intuition),
+              (FNDedTheorems.deMorgOr a b, Intuition),
+              (FNDedTheorems.impOr a b, Intuition),
+              (FNDedTheorems.tranApp a b c, Intuition),
+              (FNDedTheorems.doubNegImp a, Intuition),
+              (FNDedTheorems.wkPeirce a b, Intuition),
+              (FNDedTheorems.lem a, Classic),
+              (FNDedTheorems.doubNegElim a, Classic),
+              (FNDedTheorems.deMorgAnd a b, Classic),
+              (FNDedTheorems.orImp a b, Classic),
+              (FNDedTheorems.peirceL a b, Classic)] where
   a = FNDed.Var 'A'
   b = FNDed.Var 'B'
   c = FNDed.Var 'C'
@@ -48,16 +54,18 @@ nDedProofs = mapMaybe getTree
 -- Type-level theorems with proofs in natural deductions.
 -- Notice: We can't use `map KGInt.pp ...` here,
 -- because all theorems have different types!
-gentzenProofs :: [ProofTree]
-gentzenProofs = [KGInt.pp KGIntTheorems.notTandF',
-                 KGInt.pp KGIntTheorems.andFlip',
-                 KGInt.pp KGIntTheorems.orFlip',
-                 KGInt.pp KGIntTheorems.distr1',
-                 KGInt.pp KGIntTheorems.distr2',
-                 KGInt.pp KGIntTheorems.impTrans',
-                 KGInt.pp KGIntTheorems.doubleNegImp',
-                 KGInt.pp KGIntTheorems.deMorgan1',
-                 KGInt.pp KGIntTheorems.deMorgan2']
+gentzenProofs :: [(ProofTree, Logic)]
+gentzenProofs = [(KGInt.pp KGIntTheorems.notTandF', Intuition),
+                 (KGInt.pp KGIntTheorems.andFlip', Intuition),
+                 (KGInt.pp KGIntTheorems.orFlip', Intuition),
+                 (KGInt.pp KGIntTheorems.distr1', Intuition),
+                 (KGInt.pp KGIntTheorems.distr2', Intuition),
+                 (KGInt.pp KGIntTheorems.impTrans', Intuition),
+                 (KGInt.pp KGIntTheorems.doubleNegImp', Intuition),
+                 (KGInt.pp KGIntTheorems.deMorgan1', Intuition),
+                 (KGInt.pp KGIntTheorems.deMorgan2', Intuition),
+                 (KGCl.pp KGClTheorems.doubNeg1', Classic),
+                 (KGCl.pp KGClTheorems.excludedMiddle', Classic)]
 
 main :: IO ()
 main = do
@@ -99,7 +107,7 @@ main = do
     -- in natural deduction styles,
     -- and the part that prints type-level theorems with proofs
     -- in Gentzen style.
-    showProofMenu :: [ProofTree] -> IO ()
+    showProofMenu :: [(ProofTree, Logic)] -> IO ()
     showProofMenu pfs = do
       putSeparation "-"
       putStrLn "Which proof would you like me to print?"
@@ -112,23 +120,24 @@ main = do
       runCommandShowProofMenu pfs c
     -- Execute the command in the show proof menu.
     -- Print the `ProofTree` if the command is a valid number.
-    runCommandShowProofMenu :: [ProofTree] -> String -> IO ()
+    runCommandShowProofMenu :: [(ProofTree, Logic)] -> String -> IO ()
     runCommandShowProofMenu _ "x" = return ()
     runCommandShowProofMenu _ "q" = mainMenu
     runCommandShowProofMenu pfs x =
       (case (readMaybe x :: Maybe Int) of
         Just i ->
           if i <= length pfs then
-            printTree (pfs !! (i - 1))
+            printTree $ fst (pfs !! (i - 1))
             else putStrLn "Invalid number."
         Nothing ->
           putStrLn $ "Sorry. I don't understand your command." ++
           " Please try again.") >>
      showProofMenu pfs
     -- Takes a list of `ProofTree``, show the proved theorems
-    theoremsToShow :: [ProofTree] -> [String]
-    theoremsToShow ps = [show i ++ ": " ++ showTheorem t |
-                          (i, t) <- zip [1..] ps]
+    theoremsToShow :: [(ProofTree, Logic)] -> [String]
+    theoremsToShow ps = [show i ++ ": " ++ showTheorem t ++
+                          " (" ++ show l ++ ")" |
+                          (i, (t, l)) <- zip [1..] ps]
     -- Put some separation symbols on the screen
     putSeparation :: String -> IO ()
     putSeparation c = replicateM_ 80 (putStr c) >> putStrLn ""

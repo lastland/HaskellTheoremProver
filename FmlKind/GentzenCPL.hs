@@ -83,7 +83,7 @@ data Derives :: [Formula] -> [Formula] -> * where
 
 pp :: forall gamma delta. (Seqt gamma, Seqt delta) =>
   Derives gamma delta -> ProofTree
-pp theorem = l $ g ++ " |- " ++ d
+pp theorem = l $ g ++ (if null g then "" else " ") ++ "|- " ++ d
   where
   l x = pNode x xs
   xs = case theorem of

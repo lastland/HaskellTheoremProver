@@ -60,16 +60,16 @@ instance Seqt Bottom where
   ppt _ = "⊥"
 
 instance Seqt a => Seqt (Not a) where
-  ppt e@(SNot a) = "~" ++ lp a e ++ ""
+  ppt e@(SNot a) = "~" ++ lp (<=) a e ++ ""
 
 instance (Seqt a, Seqt b) => Seqt (And a b) where
-  ppt e@(SAnd a b) = lp a e ++ " /\\ " ++ lp b e where
+  ppt e@(SAnd a b) = lp (<=) a e ++ " /\\ " ++ lp (<) b e where
 
 instance (Seqt a, Seqt b) => Seqt (Or a b) where
-  ppt e@(SOr a b) = lp a e ++ " \\/ " ++ lp b e
+  ppt e@(SOr a b) = lp (<=) a e ++ " \\/ " ++ lp (<) b e
 
 instance (Seqt a, Seqt b) => Seqt (Imp a b) where
-  ppt e@(SImp a b) = lp a e ++ " -> " ++ lp b e
+  ppt e@(SImp a b) = lp (<=) a e ++ " -> " ++ lp (<) b e
 
 instance Seqt ('[]) where
   ppt (S.SNil)       = ""
@@ -88,8 +88,8 @@ level (SOr  _ _) = 5
 level (SImp _ _) = 2
 
 lp :: forall (a :: Formula) (b :: Formula). (Seqt a, Seqt b) =>
-      Sing a -> Sing b -> String
-lp x e = (if level x < level e then parens else id) (ppt x)
+      (Int -> Int -> Bool) -> Sing a -> Sing b -> String
+lp f x e = (if f (level x) (level e) then parens else id) (ppt x)
 
 parens :: String -> String
 parens s = "(" ++ s ++ ")"
