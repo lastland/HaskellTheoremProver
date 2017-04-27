@@ -4,7 +4,7 @@
 
 module FmlKind.GentzenIPLTheorems where
 
-import           FmlKind.Gentzen
+import           FmlKind.Basic
 import           FmlKind.GentzenIPL
 import           Printing.ProofTree
 

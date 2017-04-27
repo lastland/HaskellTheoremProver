@@ -4,7 +4,7 @@ import           System.IO
 import           Test.HUnit
 import           Text.Read
 
-import qualified FmlKind.Gentzen            as KGentzen
+import qualified FmlKind.Basic              as KGBasic
 import qualified FmlKind.GentzenCPL         as KGCl
 import qualified FmlKind.GentzenCPLTheorems as KGClTheorems
 import qualified FmlKind.GentzenIPL         as KGInt

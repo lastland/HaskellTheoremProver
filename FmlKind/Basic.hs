@@ -8,7 +8,7 @@
 {-# LANGUAGE TypeFamilies      #-}
 {-# LANGUAGE TypeOperators     #-}
 
-module FmlKind.Gentzen where
+module FmlKind.Basic where
 
 import           Data.Singletons
 import qualified Data.Singletons.Prelude.List as S
