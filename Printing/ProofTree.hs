@@ -1,4 +1,4 @@
-module ProofTree where
+module Printing.ProofTree where
 
 import           Data.Tree
 import           Data.Tree.Pretty

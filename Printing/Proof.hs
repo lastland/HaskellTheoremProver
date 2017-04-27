@@ -1,7 +1,7 @@
-module Proof where
+module Printing.Proof where
 
 import           Data.Tree
-import           ProofTree
+import           Printing.ProofTree
 
 class PP a where
    pp :: a -> String

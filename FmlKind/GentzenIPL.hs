@@ -5,12 +5,12 @@
 {-# LANGUAGE TypeFamilies        #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module GentzenIPL where
+module FmlKind.GentzenIPL where
 
 import           Data.Singletons              (Sing, sing)
 import           Data.Singletons.Prelude.List ((:++))
-import           Gentzen
-import           ProofTree
+import           FmlKind.Gentzen
+import           Printing.ProofTree
 
 data Derives :: [Formula] -> Formula -> * where
   T      :: Seqt gamma => Derives gamma Top

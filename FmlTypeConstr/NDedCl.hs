@@ -1,26 +1,25 @@
-
-{-# LANGUAGE PolyKinds #-}
-{-# LANGUAGE GADTs #-}
-{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE DataKinds     #-}
+{-# LANGUAGE GADTs         #-}
+{-# LANGUAGE PolyKinds     #-}
 {-# LANGUAGE TypeOperators #-}
 
-module NDedCl where
+module FmlTypeConstr.NDedCl where
 
-import Basic
-import NDedInt
+import           FmlTypeConstr.Basic
+import           FmlTypeConstr.NDedInt
 
 -----------------------------------------------------------
         --Classical Natural Deduction Rules
 -----------------------------------------------------------
-           
+
 data DerivesC (ctx :: [*]) a where
 
   TrC    ::  -------------------------------------
              DerivesC ctx (Formula Top)
-  
+
   IdC    ::  --------------------------------------
              DerivesC (Formula a : ctx) (Formula a)
-  
+
   WkC    ::  DerivesC ctx (Formula a) ->
              --------------------------------------
              DerivesC (Formula c : ctx) (Formula a)
@@ -28,7 +27,7 @@ data DerivesC (ctx :: [*]) a where
   CnC    ::  DerivesC (b : b : ctx) (Formula a) ->
              --------------------------------------
              DerivesC (b : ctx) (Formula a)
-        
+
   ExC    ::  DerivesC ctx1 (Formula Top) ->
              DerivesC ctx2 (Formula Top) ->
              DerivesC '[b1] (Formula Top) ->
@@ -36,48 +35,48 @@ data DerivesC (ctx :: [*]) a where
              DerivesC (ctx1 ++ (b1 : b2 : ctx2)) (Formula a) ->
              ---------------------------------------------------
              DerivesC (ctx1 ++ (b2 : b1 : ctx2)) (Formula a)
-        
+
   AndIC  ::  DerivesC ctx (Formula a1) ->
              DerivesC ctx (Formula a2) ->
              ------------------------------------
              DerivesC ctx (Formula (a1 :/\: a2))
-          
+
   AndE1C ::  DerivesC ctx (Formula (a1 :/\: a2)) ->
              ---------------------------------------
              DerivesC ctx (Formula a1)
-  
+
   AndE2C ::  DerivesC ctx (Formula (a1 :/\: a2)) ->
              ---------------------------------------
              DerivesC ctx (Formula a2)
-  
+
   OrI1C  ::  DerivesC ctx (Formula a1) ->
              -------------------------------------
              DerivesC ctx (Formula (a1 :\/: a2))
-  
+
   OrI2C  ::  DerivesC ctx (Formula a2) ->
              --------------------------------------
              DerivesC ctx (Formula (a1 :\/: a2))
-  
+
   OrEC   ::  DerivesC (Formula a1 : ctx) (Formula a) ->
              DerivesC (Formula a2 : ctx) (Formula a) ->
              DerivesC ctx (Formula (a1 :\/: a2)) ->
              -------------------------------------------
              DerivesC ctx (Formula a)
-           
+
   ImpIC  ::  DerivesC (Formula a : ctx) (Formula b) ->
              -------------------------------------------
              DerivesC ctx (Formula (a :~>: b))
-           
+
   ImpEC  ::  DerivesC ctx (Formula (a :~>: b)) ->
              DerivesC ctx (Formula a) ->
              --------------------------------------
              DerivesC ctx (Formula b)
-  
+
   Dne    ::  DerivesC ctx (Formula ((a :~>: Bot) :~>: Bot)) ->
              --------------------------------------------------
              DerivesC ctx (Formula a)
 
-           
+
 ----------------------------------------------------------------
         -- Classical Theorems
 ----------------------------------------------------------------
@@ -100,7 +99,7 @@ int2C (ImpI s)                  = ImpIC (int2C s)
 int2C (ImpE s1 s2)              = ImpEC (int2C s1) (int2C s2)
 int2C (BotE s)                  = Dne (ImpIC (WkC (int2C s)))
 
--- |- T    
+-- |- T
 empDerTrC :: DerivesC '[] (Formula Top)
 empDerTrC = TrC
 
@@ -108,22 +107,22 @@ empDerTrC = TrC
 flipCtxC :: DerivesC  (Formula p : Formula q : ctx) (Formula r) ->
             DerivesC  (Formula q : Formula p : ctx) (Formula r)
 flipCtxC t = ExC empDerTrC TrC TrC TrC t
-           
--- |- p \/ ~p 
+
+-- |- p \/ ~p
 lem :: DerivesC '[]
                  (Formula (p :\/: (p :~>: Bot)))
 lem = Dne (ImpIC (ImpEC (AndE1C dm) (Dne (AndE2C dm))))
-       where dm = int2C deMorIntA      
+       where dm = int2C deMorIntA
 
 -- |- ((p -> q) -> p) -> p
 peirceL :: DerivesC '[]
                      (Formula (((p :~>: q) :~>: p) :~>: p))
 peirceL = ImpIC $ OrEC IdC
-               (ImpEC (flipCtxC IdC) 
+               (ImpEC (flipCtxC IdC)
                       (int2C (ImpI (BotE (ImpE (flipCtx Id) Id)))))
                (WkC lem)
-   
--- p -> q |- ~p \/ q 
+
+-- p -> q |- ~p \/ q
 impOr :: DerivesC '[Formula (p :~>: q)]
                    (Formula ((p :~>: Bot) :\/: q))
 impOr = OrEC (OrI2C (ImpEC (flipCtxC IdC) IdC))

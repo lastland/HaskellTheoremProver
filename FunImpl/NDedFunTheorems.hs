@@ -1,11 +1,11 @@
 {-# LANGUAGE FlexibleInstances #-}
 
-module NDedFunTheorems where
+module FunImpl.NDedFunTheorems where
 
-import           Data.Set   hiding (map)
-import           NDedFun
-import           Proof
-import           ProofTree
+import           Data.Set           hiding (map)
+import           FunImpl.NDedFun
+import           Printing.Proof
+import           Printing.ProofTree
 import           Test.HUnit
 
 ------------------------------------------------------------------------

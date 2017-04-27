@@ -2,10 +2,10 @@
 {-# LANGUAGE ScopedTypeVariables #-}
 {-# LANGUAGE TypeOperators       #-}
 
-module GentzenCPLTheorems where
+module FmlKind.GentzenCPLTheorems where
 
-import           Gentzen
-import           GentzenCPL
+import           FmlKind.Gentzen
+import           FmlKind.GentzenCPL
 import           ProofTree
 
 simple :: Derives '[VA] '[VA]

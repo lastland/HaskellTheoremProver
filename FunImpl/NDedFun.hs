@@ -1,22 +1,22 @@
-module NDedFun (Sequent, Pf,
-                Formula(Bot, Var, And, Or, Imp),
-                ax, wkn,
-                andI, andE1, andE2,
-                orI1, orI2, orE,
-                impI, impE, botEInt, botECl,
-                axP, wknP,
-                andIP, andEP1, andEP2,
-                orIP1, orIP2, orEP,
-                impIP, impEP, botEIntP, botEClP,
-                (/\), (\/), (~>),
-                isAtomic, ctxt, thes) where
+module FunImpl.NDedFun (Sequent, Pf,
+                        Formula(Bot, Var, And, Or, Imp),
+                        ax, wkn,
+                        andI, andE1, andE2,
+                        orI1, orI2, orE,
+                        impI, impE, botEInt, botECl,
+                        axP, wknP,
+                        andIP, andEP1, andEP2,
+                        orIP1, orIP2, orEP,
+                        impIP, impEP, botEIntP, botEClP,
+                        (/\), (\/), (~>),
+                        isAtomic, ctxt, thes) where
 
-import           Data.List (intercalate)
-import           Data.Set  hiding (map)
-import qualified Data.Set  as Set
+import           Data.List      (intercalate)
+import           Data.Set       hiding (map)
+import qualified Data.Set       as Set
 import           Data.Tree
-import           Proof     (PP, getTree, lift, lift1, lift2, lift3, pp)
-import qualified Proof
+import           Printing.Proof (PP, getTree, lift, lift1, lift2, lift3, pp)
+import qualified Printing.Proof as Proof
 
 data Formula =
       Bot

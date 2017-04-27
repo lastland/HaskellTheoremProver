@@ -4,10 +4,10 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE TypeOperators #-}
-    
-module Basic where
 
-data Bot 
+module FmlTypeConstr.Basic where
+
+data Bot
 data Top where
    One :: Top
 
