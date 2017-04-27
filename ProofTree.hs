@@ -7,9 +7,28 @@ type ProofTree = Tree String
 
 pNode = Node
 
+showTree :: ProofTree -> String
+showTree = drawVerticalTreeWith 5
+
+showMaybeTree :: Maybe ProofTree -> String
+showMaybeTree (Just t) = showTree t
+showMaybeTree _        = "The proof was wrong"
+
 printTree :: ProofTree -> IO ()
-printTree = putStrLn . drawVerticalTreeWith 5
+printTree = putStrLn . showTree
 
 printMaybeTree :: Maybe ProofTree -> IO ()
-printMaybeTree (Just t) = printTree t
-printMaybeTree _        = putStrLn "The proof was wrong"
+printMaybeTree = putStrLn . showMaybeTree
+
+showTheorem :: ProofTree -> String
+showTheorem (Node thm _) = thm
+
+showMaybeTheorem :: Maybe ProofTree -> String
+showMaybeTheorem (Just t) = showTheorem t
+showMaybeTheorem _        = "No proven theorem"
+
+printTheorem :: ProofTree -> IO ()
+printTheorem = putStrLn . showTheorem
+
+printMaybeTheorem :: Maybe ProofTree -> IO ()
+printMaybeTheorem = putStrLn . showMaybeTheorem

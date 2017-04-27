@@ -13,6 +13,7 @@ module NDedFun (Sequent, Pf,
 
 import           Data.List (intercalate)
 import           Data.Set  hiding (map)
+import qualified Data.Set  as Set
 import           Data.Tree
 import           Proof     (PP, getTree, lift, lift1, lift2, lift3, pp)
 import qualified Proof
@@ -42,27 +43,34 @@ isAtomic (Var _) = True
 isAtomic _       = False
 
 level :: Formula -> Int
-level Bot       = 100
-level (Var _)   = 100
-level (And _ _) = 8
-level (Or _ _)  = 5
-level (Imp _ _) = 2
+level Bot         = 100
+level (Var _)     = 100
+level (And _ _)   = 8
+level (Or _ _)    = 5
+level (Imp _ Bot) = 50
+level (Imp _ _)   = 2
 
-lp :: Formula -> Formula -> String
-lp x e = (if level x < level e then parens else id) (pp x)
+lp :: (Int -> Int -> Bool) -> Formula -> Formula -> String
+lp f x e = (if f (level x) (level e) then parens else id) (pp x)
 
 parens :: String -> String
 parens s = "(" ++ s ++ ")"
 
 instance PP Formula where
-  pp Bot           = "⊥"
-  pp (Var c)       = [c]
-  pp e@(And f1 f2) = lp f1 e ++ " /\\ " ++ lp f2 e
-  pp e@(Or  f1 f2) = lp f1 e ++ " \\/ " ++ lp f2 e
-  pp e@(Imp f1 f2) = lp f1 e ++ " ~> " ++ lp f2 e
+  pp Bot                 = "⊥"
+  pp (Var c)             = [c]
+  pp (Imp Bot Bot)       = "~" ++ pp Bot
+  pp (Imp e@(Var _) Bot) = "~" ++ pp e
+  pp (Imp f Bot)         = "~(" ++ pp f ++ ")"
+  pp e@(And f1 f2)       = lp (<=) f1 e ++ " /\\ " ++ lp (<) f2 e
+  pp e@(Or  f1 f2)       = lp (<=) f1 e ++ " \\/ " ++ lp (<) f2 e
+  pp e@(Imp f1 f2)       = lp (<=) f1 e ++ " ~> " ++ lp (<) f2 e
 
 instance PP Sequent where
-  pp (Seq ctx thm) = intercalate ", " (pp <$> toList ctx) ++ " |- " ++ pp thm
+  pp (Seq ctx thm) | Set.null ctx = t
+                   | otherwise = intercalate ", " (pp <$> toList ctx)
+                                 ++ " " ++ t where
+                       t =  "|- " ++ pp thm
 
 -------------------------------------------------------------------------------
         --Intuitionistic functions
