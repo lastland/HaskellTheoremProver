@@ -24,7 +24,7 @@ import qualified Printing.Proof             as Proof
 import           Printing.ProofTree         (ProofTree, printTree, showTheorem)
 import qualified Printing.ProofTree         as ProofTree
 
-
+-- Data-level theorems with proofs in natural deductions.
 nDedProofs :: [ProofTree]
 nDedProofs = mapMaybe getTree
              [FNDedTheorems.andFlip a b,
@@ -45,8 +45,9 @@ nDedProofs = mapMaybe getTree
   b = FNDed.Var 'B'
   c = FNDed.Var 'C'
 
--- Can we use `map KGInt.pp ...` here?
--- No, because all theorems have different types!
+-- Type-level theorems with proofs in natural deductions.
+-- Notice: We can't use `map KGInt.pp ...` here,
+-- because all theorems have different types!
 gentzenProofs :: [ProofTree]
 gentzenProofs = [KGInt.pp KGIntTheorems.notTandF',
                  KGInt.pp KGIntTheorems.andFlip',
@@ -68,6 +69,7 @@ main = do
   mainMenu
   putStrLn "Bye!"
   where
+    -- The main menu.
     mainMenu :: IO ()
     mainMenu = do
       putSeparation "="
@@ -81,6 +83,7 @@ main = do
       hFlush stdout
       c <- getLine
       runCommandMainMenu c
+    -- Execute user's command in the main menu.
     runCommandMainMenu :: String -> IO ()
     runCommandMainMenu "1" = showProofMenu nDedProofs
     runCommandMainMenu "2" = showProofMenu gentzenProofs
@@ -88,6 +91,14 @@ main = do
     runCommandMainMenu _ = do
       putStrLn "Sorry. I don't understand your command. Please try again."
       mainMenu
+    -- The "show proof menu":
+    -- Users can choose to print the proof of a theorem from our theorem list,
+    -- or get back to the main menu, or exit our program.
+    -- Notice that this function is shared by
+    -- the part that prints data-level theorems with proofs
+    -- in natural deduction styles,
+    -- and the part that prints type-level theorems with proofs
+    -- in Gentzen style.
     showProofMenu :: [ProofTree] -> IO ()
     showProofMenu pfs = do
       putSeparation "-"
@@ -99,6 +110,8 @@ main = do
       hFlush stdout
       c <- getLine
       runCommandShowProofMenu pfs c
+    -- Execute the command in the show proof menu.
+    -- Print the `ProofTree` if the command is a valid number.
     runCommandShowProofMenu :: [ProofTree] -> String -> IO ()
     runCommandShowProofMenu _ "x" = return ()
     runCommandShowProofMenu _ "q" = mainMenu
@@ -112,8 +125,10 @@ main = do
           putStrLn $ "Sorry. I don't understand your command." ++
           " Please try again.") >>
      showProofMenu pfs
+    -- Takes a list of `ProofTree``, show the proved theorems
     theoremsToShow :: [ProofTree] -> [String]
     theoremsToShow ps = [show i ++ ": " ++ showTheorem t |
                           (i, t) <- zip [1..] ps]
+    -- Put some separation symbols on the screen
     putSeparation :: String -> IO ()
     putSeparation c = replicateM_ 80 (putStr c) >> putStrLn ""
