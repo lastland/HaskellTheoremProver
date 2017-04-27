@@ -1,9 +1,11 @@
 module NDedFun (Sequent, Pf,
                 Formula(Bot, Var, And, Or, Imp),
-                ax, andI, andE1, andE2,
+                ax, wkn,
+                andI, andE1, andE2,
                 orI1, orI2, orE,
                 impI, impE, botEInt, botECl,
-                axP, andIP, andEP1, andEP2,
+                axP, wknP,
+                andIP, andEP1, andEP2,
                 orIP1, orIP2, orEP,
                 impIP, impEP, botEIntP, botEClP,
                 (/\), (\/), (~>),
@@ -75,6 +77,12 @@ ax f ctx | member f ctx = Just (Seq ctx f)
 axP :: Formula -> Set Formula -> Pf
 axP f ctx = lift (ax f ctx)
 
+wkn :: Formula -> Sequent -> Maybe Sequent
+wkn p (Seq ctx th) = Just (Seq (insert p ctx) th)
+
+wknP :: Formula -> Pf -> Pf
+wknP p = lift1 (wkn p)
+
 andI :: Sequent -> Sequent -> Maybe Sequent
 andI (Seq ctx1 th1) (Seq ctx2 th2) | ctx1 == ctx2 = Just (Seq ctx1 (th1 /\ th2))
                                    | otherwise    = Nothing
@@ -119,13 +127,13 @@ orE _ _ _                             = Nothing
 orEP :: Pf -> Pf -> Pf -> Pf
 orEP = lift3 orE
 
-impI :: Formula -> Formula -> Sequent -> Maybe Sequent
-impI f1 f2 (Seq ctx f)
-        | member f1 ctx && f == f2 = Just (Seq (delete f1 ctx) (f1 ~> f2))
-        | otherwise                = Nothing
+impI :: Formula -> Sequent -> Maybe Sequent
+impI f1 (Seq ctx f)
+        | member f1 ctx   = Just (Seq (delete f1 ctx) (f1 ~> f))
+        | otherwise       = Nothing
 
-impIP :: Formula -> Formula -> Pf -> Pf
-impIP f1 f2 = lift1 (impI f1 f2)
+impIP :: Formula -> Pf -> Pf
+impIP f1 = lift1 (impI f1)
 
 impE :: Sequent -> Sequent -> Maybe Sequent
 impE (Seq ctx1 (Imp f1 f2)) (Seq ctx2 f)
