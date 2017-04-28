@@ -96,7 +96,7 @@ impOr p q = let hyp  = insert p (singleton ((p ~> Bot) \/ q))
 -- p -> (q -> r), p -> q, p |- r (Int)
 tranApp :: Formula -> Formula -> Formula -> Pf
 tranApp p q r = let
-     hyp = insert (p ~> (q ~> r)) ((insert (p ~> q)) (singleton p))
+     hyp = insert (p ~> (q ~> r)) (insert (p ~> q) (singleton p))
      s1 = axP (p ~> (q ~> r)) hyp
      s2 = axP p hyp
      s3 = impEP s1 s2

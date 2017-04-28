@@ -76,7 +76,7 @@ instance Seqt a => Seqt (Not a) where
   ppt e@(SNot a) = "~" ++ lp (<=) a e ++ ""
 
 instance (Seqt a, Seqt b) => Seqt (And a b) where
-  ppt e@(SAnd a b) = lp (<=) a e ++ " /\\ " ++ lp (<) b e where
+  ppt e@(SAnd a b) = lp (<=) a e ++ " /\\ " ++ lp (<) b e
 
 instance (Seqt a, Seqt b) => Seqt (Or a b) where
   ppt e@(SOr a b) = lp (<=) a e ++ " \\/ " ++ lp (<) b e
@@ -85,11 +85,11 @@ instance (Seqt a, Seqt b) => Seqt (Imp a b) where
   ppt e@(SImp a b) = lp (<=) a e ++ " -> " ++ lp (<) b e
 
 instance Seqt ('[]) where
-  ppt (S.SNil)       = ""
+  ppt S.SNil = ""
 
 instance (Seqt a, Seqt as) => Seqt (a ': as) where
   ppt (S.SCons a S.SNil) = ppt a
-  ppt (S.SCons a as)     = (ppt a) ++ ", " ++ (ppt as)
+  ppt (S.SCons a as)     = ppt a ++ ", " ++ ppt as
 
 -- For associations, etc.
 level :: forall (a :: Formula). Seqt a => Sing a -> Int

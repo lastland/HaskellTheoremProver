@@ -105,7 +105,7 @@ empDerTrP = TrP
 -- (x2 : q), (x1 : p), (x3 : r), (x4 : s), ... |- x : r
 flipCtxP :: DerivesP  (IsProof x1 p : IsProof x2 q : ctx) x (Formula r) ->
             DerivesP  (IsProof x2 q : IsProof x1 p : ctx) x (Formula r)
-flipCtxP t = ExP empDerTrP TrP TrP TrP t
+flipCtxP = ExP empDerTrP TrP TrP TrP
 
 -- x : p |- x : p
 pImppP :: DerivesP '[IsProof x p] x (Formula p)

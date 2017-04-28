@@ -106,7 +106,7 @@ empDerTrC = TrC
 -- p, q, r, s, ... |- r <=> q, p, r, s, ... |- r
 flipCtxC :: DerivesC  (Formula p : Formula q : ctx) (Formula r) ->
             DerivesC  (Formula q : Formula p : ctx) (Formula r)
-flipCtxC t = ExC empDerTrC TrC TrC TrC t
+flipCtxC = ExC empDerTrC TrC TrC TrC
 
 -- |- p \/ ~p
 lem :: DerivesC '[]

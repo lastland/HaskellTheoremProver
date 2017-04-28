@@ -85,7 +85,7 @@ empDerTrG = TrGI
 -- p, q, r, s, ... |- r <=> q, p, r, s, ... |- r
 flipCtxG :: DerivesGI  (Formula p : Formula q : ctx) (Formula r) ->
             DerivesGI  (Formula q : Formula p : ctx) (Formula r)
-flipCtxG t = ExL empDerTrG TrGI TrGI TrGI t
+flipCtxG = ExL empDerTrG TrGI TrGI TrGI
 
 
 -- p /\ (q \/ r) |- (p /\ q) \/ (p /\ r)

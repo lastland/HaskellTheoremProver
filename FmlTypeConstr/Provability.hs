@@ -4,7 +4,7 @@
 
 module FmlTypeConstr.Provability where
 
-import             FmlTypeConstr.Basic
+import           FmlTypeConstr.Basic
 
 data Provable b a where
    Proof :: (HList b -> a) -> Provable b (Formula a)
@@ -80,8 +80,8 @@ doubNegImpP = Proof $ \(HCons p HNil) -> ImpT (\(ImpT f) -> f p)
 deMorIntP :: Provable '[(p :\/: q) :~>: Bot]
                        (Formula ((p :~>: Bot) :/\: (q :~>: Bot)))
 deMorIntP = Proof $ \(HCons (ImpT f) HNil) ->
-                      AndT (ImpT (\p -> f (OrT1 p)))
-                           (ImpT (\q -> f (OrT2 q)))
+                      AndT (ImpT (f . OrT1))
+                           (ImpT (f . OrT2))
 
 -- ~p /\ ~q |- ~(p \/ q)
 deMorInt'P :: Provable '[(p :~>: Bot) :/\: (q :~>: Bot)]
@@ -99,12 +99,12 @@ deMor2'P = Proof $ \(HCons x HNil) ->
                         OrT1 (ImpT f) -> ImpT (\(AndT p _) -> f p)
                         OrT2 (ImpT g) -> ImpT (\(AndT _ q) -> g q)
 
--- ~p \/ q |- p -> q 
+-- ~p \/ q |- p -> q
 orImpP :: Provable '[(p :~>: Bot) :\/: q]
                     (Formula (p :~>: q))
 orImpP = Proof $ \(HCons x HNil) -> case x of
-                                      OrT1 (ImpT f) -> ImpT (\p -> abort (f p))
-                                      OrT2 q        -> ImpT (\_ -> q)
+                                      OrT1 (ImpT f) -> ImpT (abort . f)
+                                      OrT2 q        -> ImpT (const q)
 
 -- |- ((((p -> q) -> p) -> p) -> q) -> q
 wkPeirceP :: Provable '[]
@@ -112,6 +112,6 @@ wkPeirceP :: Provable '[]
 wkPeirceP = Proof $ \HNil -> ImpT
                     (\(ImpT f) -> f (ImpT
                        (\(ImpT g) -> g (ImpT
-                          (\p -> f (ImpT (\_ -> p)))))))
+                          (f . ImpT . const)))))
 
 -----------------------------------------------------------------------

@@ -87,7 +87,7 @@ empDerTr = Tr
 -- p, q, r, s, ... |- r <=> q, p, r, s, ... |- r
 flipCtx :: DerivesI  (Formula p : Formula q : ctx) (Formula r) ->
            DerivesI  (Formula q : Formula p : ctx) (Formula r)
-flipCtx t = Ex empDerTr Tr Tr Tr t
+flipCtx = Ex empDerTr Tr Tr Tr
 
 -- p |- p
 pImpp :: DerivesI '[Formula p] (Formula p)
@@ -109,13 +109,13 @@ andFlipAEx :: DerivesI '[Formula (TNat Z :/\: TNat (S Z))]
 andFlipAEx = andFlipA
 
 
--- p \/ q |- q \/ p 
+-- p \/ q |- q \/ p
 orFlipA :: DerivesI '[Formula (p :\/: q)]
                     (Formula (q :\/: p))
 orFlipA = OrE (OrI2 Id) (OrI1 Id) Id
 
 
--- p /\ (q \/ r) |- (p /\ q) \/ (p /\ r) 
+-- p /\ (q \/ r) |- (p /\ q) \/ (p /\ r)
 distr1A :: DerivesI '[Formula (p :/\: (q :\/: r))]
                     (Formula ((p :/\: q) :\/: (p :/\: r)))
 distr1A = OrE (OrI1 (AndI (AndE1 a) Id))
@@ -124,7 +124,7 @@ distr1A = OrE (OrI1 (AndI (AndE1 a) Id))
      where a = flipCtx Id
 
 
--- (p /\ q) \/ (p /\ r) |- p /\ (q \/ r) 
+-- (p /\ q) \/ (p /\ r) |- p /\ (q \/ r)
 distr1'A :: DerivesI '[Formula ((p :/\: q) :\/: (p :/\: r))]
                       (Formula (p :/\: (q :\/: r)))
 distr1'A = OrE (AndI (AndE1 Id) (OrI1 (AndE2 Id)))
@@ -132,14 +132,14 @@ distr1'A = OrE (AndI (AndE1 Id) (OrI1 (AndE2 Id)))
                Id
 
 
--- p \/ (q /\ r) |- (p \/ q) /\ (p \/ r) 
+-- p \/ (q /\ r) |- (p \/ q) /\ (p \/ r)
 distr2A :: DerivesI '[Formula (p :\/: (q :/\: r))]
                     (Formula ((p :\/: q) :/\: (p :\/: r)))
 distr2A = AndI (OrE (OrI1 Id) (OrI2 (AndE1 Id)) Id)
                (OrE (OrI1 Id) (OrI2 (AndE2 Id)) Id)
 
 
--- (p \/ q) /\ (p \/ r) |- p \/ (q /\ r) 
+-- (p \/ q) /\ (p \/ r) |- p \/ (q /\ r)
 distr2'A :: DerivesI '[Formula ((p :\/: q) :/\: (p :\/: r))]
                       (Formula (p :\/: (q :/\: r)))
 distr2'A = OrE (OrI1 Id)
@@ -157,20 +157,20 @@ impTransA = ImpI (ImpE (ImpE (flipCtx Id) Id)
                  a1 = Tr
 
 
--- p |- ~~p 
+-- p |- ~~p
 doubNegImpA :: DerivesI '[Formula p]
                          (Formula ((p :~>: Bot) :~>: Bot))
 doubNegImpA = ImpI (ImpE Id (flipCtx Id))
 
 
--- ~(p \/ q) |- ~p /\ ~q 
+-- ~(p \/ q) |- ~p /\ ~q
 deMorIntA :: DerivesI '[Formula ((p :\/: q) :~>: Bot)]
                        (Formula ((p :~>: Bot) :/\: (q :~>: Bot)))
 deMorIntA = AndI (ImpI (ImpE (flipCtx Id) (OrI1 Id)))
                  (ImpI (ImpE (flipCtx Id) (OrI2 Id)))
 
 
--- ~p /\ ~q |- ~(p \/ q) 
+-- ~p /\ ~q |- ~(p \/ q)
 deMorInt'A :: DerivesI '[Formula ((p :~>: Bot) :/\: (q :~>: Bot))]
                         (Formula ((p :\/: q) :~>: Bot))
 deMorInt'A = ImpI (flipCtx (OrE (ImpE (flipCtx (AndE1 Id)) Id)
@@ -178,7 +178,7 @@ deMorInt'A = ImpI (flipCtx (OrE (ImpE (flipCtx (AndE1 Id)) Id)
                                 (flipCtx Id)))
 
 
--- ~p \/ ~q |- ~(p /\ q) 
+-- ~p \/ ~q |- ~(p /\ q)
 deMor2'A :: DerivesI '[Formula ((p :~>: Bot) :\/: (q :~>: Bot))]
                      (Formula ((p :/\: q) :~>: Bot))
 deMor2'A = ImpI (OrE (ImpE Id (flipCtx (AndE1 Id)))
@@ -186,7 +186,7 @@ deMor2'A = ImpI (OrE (ImpE Id (flipCtx (AndE1 Id)))
                       (flipCtx Id))
 
 
--- ~p \/ q |- p -> q 
+-- ~p \/ q |- p -> q
 orImpA :: DerivesI '[Formula ((p :~>: Bot) :\/: q)]
                     (Formula (p :~>: q))
 orImpA = ImpI (flipCtx (OrE
@@ -196,7 +196,7 @@ orImpA = ImpI (flipCtx (OrE
                 a1 = Tr
 
 
--- |- ((((p -> q) -> p) -> p) -> q) -> q 
+-- |- ((((p -> q) -> p) -> p) -> q) -> q
 wkPeirceA :: DerivesI '[]
                      (Formula (((((p :~>: q) :~>: p) :~>: p) :~>: q) :~>: q))
 wkPeirceA = ImpI (ImpE Id
