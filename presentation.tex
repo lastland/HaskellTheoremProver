@@ -237,6 +237,8 @@ A /\ B |- A /\ B   A /\ B |- A /\ B
 \end{verbatim}
 \end{minipage}
 \end{center}
+
+\pause To construct a proof tree, we need two things: {\color{blue}the sequent}, and {\color{blue}the proof}.
 \end{frame}
  
  %------------------------------------------------------------
@@ -285,6 +287,8 @@ andFlip :: Derives '[p /\ q] (q /\ p)
 
 \vspace{15pt}
 \texttt{newtype Pf m a = P \{ prove :: m (a, ProofTree) \}}
+
+\pause
 
 \begin{verbatim}
 lift2 :: Monad m => (a -> b -> m c) ->
