@@ -30,8 +30,10 @@ main :: IO ()
 main = do
   putStrLn "Welcome to our Theorem Prover!"
   putStrLn "Let's start by running some tests:"
+  putStrLn "Some Intuitionistic Theorems"
   runTestTT FNDedTests.testInt
-  runTestTT FNDedTests.testInt
+  putStrLn "Some Classical Theorems"
+  runTestTT FNDedTests.testCl
   putStrLn "Tests completed."
   mainMenu
   putStrLn "Bye!"
@@ -46,7 +48,7 @@ instance Show Logic where
   show Classic   = "classical logic"
   show Intuition = "intuitionistic logic"
 
--- Data-level theorems with proofs in natural deductions.
+-- Data-level theorems with natural deduction style proofs.
 nDedProofs :: [(ProofTree, Logic)]
 nDedProofs = mapMaybe (\(x, y) -> flip (,) y <$> getTree x)
              [(FNDedTheorems.andFlip a b, Intuition),
@@ -67,7 +69,7 @@ nDedProofs = mapMaybe (\(x, y) -> flip (,) y <$> getTree x)
   b = FNDed.Var 'B'
   c = FNDed.Var 'C'
 
--- Type-level theorems with proofs in natural deductions.
+-- Type-level theorems with Gentzen-style proofs.
 -- Notice: We can't use `map KGInt.pp ...` here,
 -- because all theorems have different types!
 gentzenProofs :: [(ProofTree, Logic)]

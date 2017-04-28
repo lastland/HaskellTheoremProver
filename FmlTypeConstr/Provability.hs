@@ -4,7 +4,7 @@
 
 module FmlTypeConstr.Provability where
 
-import           FmlTypeConstr.Basic
+import             FmlTypeConstr.Basic
 
 data Provable b a where
    Proof :: (HList b -> a) -> Provable b (Formula a)
@@ -99,7 +99,7 @@ deMor2'P = Proof $ \(HCons x HNil) ->
                         OrT1 (ImpT f) -> ImpT (\(AndT p _) -> f p)
                         OrT2 (ImpT g) -> ImpT (\(AndT _ q) -> g q)
 
--- ~p \/ q |- p -> q (Proof-term level)
+-- ~p \/ q |- p -> q 
 orImpP :: Provable '[(p :~>: Bot) :\/: q]
                     (Formula (p :~>: q))
 orImpP = Proof $ \(HCons x HNil) -> case x of
