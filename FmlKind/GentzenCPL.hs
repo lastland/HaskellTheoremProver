@@ -12,6 +12,10 @@ import           Data.Singletons.Prelude.List ((:++))
 import           FmlKind.Basic
 import           Printing.ProofTree
 
+-------------------------------------------------------------------------------
+               -- Rules of Inference
+-------------------------------------------------------------------------------
+
 data Derives :: [Formula] -> [Formula] -> * where
   T      :: Seqt gamma => Derives gamma '[Top]
   I      :: Seqt a => Derives '[a] '[a]
@@ -80,6 +84,10 @@ data Derives :: [Formula] -> [Formula] -> * where
             Derives gamma '[Top] ->
             Derives delta (sigma :++ a:b:gamma) ->
             Derives delta (sigma :++ b:a:gamma)
+
+-------------------------------------------------------------------------------
+               -- Printing
+-------------------------------------------------------------------------------
 
 pp :: forall gamma delta. (Seqt gamma, Seqt delta) =>
   Derives gamma delta -> ProofTree
