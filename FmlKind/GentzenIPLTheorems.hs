@@ -18,11 +18,14 @@ flipCtx :: (Seqt a, Seqt b, Seqt c, Seqt d) =>
   Derives (a ': b ': c) d -> Derives (b ': a ': c) d
 flipCtx = PL I I empDerTr T
 
-_notTandF :: (Seqt p, Seqt q) => Derives '[p, Not p] q
-_notTandF = flipCtx . F $ LNot I
+_notTandF1 :: Seqt p => Derives '[p, Not p] Bottom
+_notTandF1 = flipCtx $ LNot I
+
+_notTandF2 :: (Seqt p, Seqt q) => Derives '[p, Not p] q
+_notTandF2 = F _notTandF1
 
 notTandF :: (Seqt p, Seqt q) => Derives '[p /\ Not p] q
-notTandF = LConj _notTandF
+notTandF = LConj _notTandF2
 
 notTandF' :: Derives '[VA /\ Not VA] VB
 notTandF' = notTandF
@@ -89,9 +92,9 @@ deMorgan2 :: forall p q .(Seqt p, Seqt q) =>
   Derives '[Not p /\ Not q] (Not (p \/ q))
 deMorgan2 = LConj . RNot $ LDisj f g where
   f :: Derives '[p, Not p, Not q] Bottom
-  f = PL I I (T :: Derives '[p] Top) T . flipCtx $ LW _notTandF
+  f = PL I I (T :: Derives '[p] Top) T . flipCtx $ LW _notTandF1
   g :: Derives '[q, Not p, Not q] Bottom
-  g = flipCtx $ LW _notTandF
+  g = flipCtx $ LW _notTandF1
 
 deMorgan2' :: Derives '[Not VA /\ Not VB] (Not (VA \/ VB))
 deMorgan2' = deMorgan2

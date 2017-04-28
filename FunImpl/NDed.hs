@@ -52,7 +52,7 @@ parens :: String -> String
 parens s = "(" ++ s ++ ")"
 
 instance PP Formula where
-  pp Bot                 = "⊥"
+  pp Bot                 = "False"
   pp (Var c)             = [c]
   pp (Imp Bot Bot)       = "~" ++ pp Bot
   pp (Imp e@(Var _) Bot) = "~" ++ pp e

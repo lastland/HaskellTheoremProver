@@ -54,10 +54,10 @@ instance Seqt (Var C) where
   ppt _ = "C"
 
 instance Seqt Top where
-  ppt _ = "⊤"
+  ppt _ = "True"
 
 instance Seqt Bottom where
-  ppt _ = "⊥"
+  ppt _ = "False"
 
 instance Seqt a => Seqt (Not a) where
   ppt e@(SNot a) = "~" ++ lp (<=) a e ++ ""

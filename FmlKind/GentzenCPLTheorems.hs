@@ -28,11 +28,6 @@ doubNeg1 = LNot $ RNot I
 doubNeg1' :: Derives '[Not (Not VA)] '[VA]
 doubNeg1' = LNot $ RNot I
 
-
--- notTandFP :: forall p q. (Seqt p, Seqt q) =>
---  Derives '[And p (Not p)] '[q]
--- notTandFP = undefined
-
 deMorInt :: forall p q. (Seqt p, Seqt q) =>
   Derives '[Not (p \/ q)] '[Not p /\ Not q]
 deMorInt = LNot (CR f) where
@@ -44,9 +39,6 @@ deMorInt = LNot (CR f) where
 
 deMorInt' :: Derives '[Not (VA \/ VB)] '[Not VA /\ Not VB]
 deMorInt' = deMorInt
-
---notTandFA :: Derives '[And p (Not p)] '[p]
---notTandFA = undefined
 
 excludedMiddle :: Seqt a => Derives '[] '[a \/ Not a]
 excludedMiddle = CR . RDisj1 . flipDer . RDisj2 . RNot $ I
