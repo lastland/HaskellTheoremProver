@@ -46,8 +46,8 @@ inductive data structure. We explore two ways in which this can be acheived.
 
 In the first approach, we construct a new kind, `Formula`, the type of all
 formulas. With this, we can construct an inductive data structure that contains
-all the rules of inference. So the language is now more expressive, and the
-theorems and proofs are shorter.
+all the rules of inference. So the language is now more expressive, and the proofs 
+are shorter.
 
 This is implemented in `FmlKind`. This folder has five files:
 - The file `Basic.hs` contains the basic definitions for this approach.
@@ -69,7 +69,7 @@ To support printing for the proof-trees we generate, we have `Printing`.
 - The file `Proof.hs` defines some higher-order functions that transform rules
   of inference into combinators for proof-trees.
 
-By creating `ProofTree` as another layer of abstractions, our `FunImpl` approach
+By creating `ProofTree` as another layer of abstraction, our `FunImpl` approach
 and `FmlKind` approach can share the same proof-tree printing utility.
 
 ### Formula as Type Constructor
@@ -78,20 +78,20 @@ In the Formula as Kind approach, we can't populate the individual formulas
 with terms. So we explore a second approach that enables us to do so. In this
 approach, `Formula` is a type constructor of kind `* -> *` . The individual
 formulas are Haskell types and as such, we can populate them with terms. So
-we can have derivation (using just the rules of inference) and evidence (by
+we can have derivations (using just the rules of inference) and evidence (by
 looking inside the types or formulas) in the same setting.
 
 This is implemented in `FmlTypeConstr`. This folder has seven files:
 - The file `Basic.hs` contains the basic definitions for this approach.
 - The file `NDedInt.hs` and `NDedCl.hs` contain the natural deduction style
-  rules for intuitionistic propositional logic and classical propositional logic
-  respectively, along with some example theorems.
+  rules for intuitionistic logic and classical logic respectively, along 
+  with some example theorems.
 - The file `GStyleInt.hs` and `GStyleCl.hs` contain the Gentzen style rules for
-  intuitionistic propositional logic and classical propositional logic
-  respectively, along with some example theorems.
+  intuitionistic logic and classical logic respectively, along with some example 
+  theorems.
 - The file `ProofObjects.hs` contains the intuitionistic natural deduction rules
   along with the corresponding proof-objects and some example theorems.
-- The file `Provability.hs` deals with evidence based proving of intuitionistic
+- The file `Provability.hs` implements evidence based proving of intuitionistic
   theorems.
 
 ## Main.hs
