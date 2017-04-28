@@ -9,7 +9,7 @@ module FunImpl.NDed (Sequent, Pf,
                      orIP1, orIP2, orEP,
                      impIP, impEP, botEIntP, botEClP,
                      (/\), (\/), (~>),
-                     isAtomic, ctxt, thes) where
+                     ctxt, thes) where
 
 import           Data.List      (intercalate)
 import           Data.Set       hiding (map)
@@ -36,11 +36,6 @@ infixl 1 ~>
 
 data Sequent = Seq {ctxt :: Set Formula,
                     thes :: Formula} deriving (Eq, Show)
-
-isAtomic :: Formula -> Bool
-isAtomic  Bot    = True
-isAtomic (Var _) = True
-isAtomic _       = False
 
 level :: Formula -> Int
 level Bot         = 100
