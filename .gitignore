@@ -2,4 +2,14 @@
 *.o
 *.dyn_hi
 *.dyn_o
+*.aux
+*.log
+*.pdf
+*.synctex.gz
+*.snm
+*.out
+*.nav
+*.toc
+*.vrb
+*.swp
 Main

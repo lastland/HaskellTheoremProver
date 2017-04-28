@@ -176,28 +176,167 @@ $$\infer[(\vee \text{I}1)]{\Gamma \vdash \phi_1 \vee \phi_2}{\Gamma \vdash \phi_
 
 %--------------------------------------------------------
 
-\begin{frame}
+\begin{frame}[fragile]
 \frametitle{\centerline{In Kind Formula}}
-\centerline{\texttt{distr :: Derives '[And p (Or q r)] ->}} \centerline{\texttt{(Or (And p r) (And q r))}}
-\pause \vspace*{20pt}
+\begin{verbatim}
+distr :: Derives '[p /\ (q \/ r)] 
+           ((p /\ r) \/ (q /\ r))
+\end{verbatim}
+\pause
+\begin{verbatim}
+OrI1 :: Derives ctx p -> 
+        Derives ctx (p \/ q)
+\end{verbatim}
+\pause
+\begin{verbatim}
+AndI :: Derives ctx p -> 
+        Derives ctx q -> 
+        Derives ctx (p /\ q)}}
+\end{verbatim}
+\end{frame}
 
-\centerline{\texttt{OrI1 :: Derives ctx p -> Derives ctx (Or p q)}} \pause \vspace*{20pt}
+%------------------------------------------------------------
 
-\center{\texttt{AndI :: Derives ctx p -> \\
-                        \hspace*{45pt}    Derives ctx q -> \\ 
-                         \hspace{74pt}   Derives ctx (And p q)}}
+\begin{frame}[fragile]
+\frametitle{\centerline{The Exchange Rule}}
 
+\begin{verbatim}
+PL :: Derives (sigma :++ a:b:gamma) delta ->
+      Derives (sigma :++ b:a:gamma) delta
+\end{verbatim}
+          
+\pause Haskell type system cannot accept this. 
+
+\pause Fortunately, there is a workaround:
+
+\begin{verbatim}
+PL :: Derives '[a] '[a] ->
+      Derives '[b] '[b] ->
+      Derives sigma '[Top] ->
+      Derives gamma '[Top] ->
+      Derives (sigma :++ a:b:gamma) delta ->
+      Derives (sigma :++ b:a:gamma) delta
+\end{verbatim}
+
+%------------------------------------------------------------
+
+\end{frame}
+
+\begin{frame}[fragile]
+\frametitle{\centerline{A Proof Tree}}
+\begin{center}
+\begin{minipage}{0.6\linewidth}
+\begin{verbatim}
+          A /\ B |- B /\ A
+                 |
+        ------------------
+       /                  \
+  A /\ B |- B        A /\ B |- A
+       |                  |
+A /\ B |- A /\ B   A /\ B |- A /\ B
+\end{verbatim}
+\end{minipage}
+\end{center}
 \end{frame}
  
  %------------------------------------------------------------
 
-\begin{frame}
-\frametitle{\centerline{Printing Proof-Trees}}
+\begin{frame}[fragile]
+\frametitle{\centerline{Constructing A Proof Tree}}
 
-"Add information about singleton types and other printing functions."
+To construct a proof tree, we need two things:
+\vspace{15pt}
+
+\center \begin{tabular}{l | c | c }
+& Sequent & Proof \\
+\hline
+Rules as Functions & \color{blue}{Y} & \color{red}{N} \\
+\hline
+Rules as Inductive Data Structures & \color{red}{N} & \color{blue}{Y}
+\end{tabular}
+
+\vspace{15pt}
+
+\begin{center}
+\begin{minipage}{0.8\linewidth}
+\begin{verbatim}
+-- Rules as Functions:
+andFlip :: Formula -> Formula -> Maybe Sequent
+-- Rules as Inductive Data Structures:
+andFlip :: Derives '[p /\ q] (q /\ p)
+\end{verbatim}
+\end{minipage}
+\end{center}
+\end{frame}
+
+%--------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{\centerline{Proof Tree: Rules as Functions}}
+
+\texttt{andI  :: Sequent -> Sequent -> Maybe Sequent}
+
+\pause
+\vspace{15pt}
+\texttt{andIP :: Proof -> Proof -> Proof}
+
+\vspace{15pt}
+\texttt{type Proof = Pf Maybe Sequent}
+
+\vspace{15pt}
+\texttt{newtype Pf m a = P \{ prove :: m (a, ProofTree) \}}
+
+\begin{verbatim}
+lift2 :: Monad m => (a -> b -> m c) ->
+    Pf m a -> Pf m b -> Pf m c
+\end{verbatim}
 
 \end{frame}
 
+%--------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{\centerline{Proof Tree: Rules as Inductive Data Structures}}
+Connecting types and values: \pause singleton types.
+
+\pause
+\begin{verbatim}
+class SingI gamma => Seqt (gamma :: k) where
+  ppt :: Sing gamma -> String
+  
+instance (Seqt a, Seqt b) => Seqt (Imp a b) where
+  ppt (SImp a b) = ppt a ++ " -> " ++ ppt b
+\end{verbatim}  
+\pause
+\begin{verbatim}
+class SingI (a :: k) where
+  sing :: Sing a
+\end{verbatim}
+\pause
+\begin{verbatim}
+pp :: forall gamma delta. (Seqt gamma, Seqt delta) =>
+  Derives gamma delta -> ProofTree
+pp = ... where -- constructing ProofTree using g and d
+  g = ppt (sing :: Sing gamma)
+  d = ppt (sing :: Sing delta)
+\end{verbatim}
+
+\end{frame}
+
+%--------------------------------------------------------
+
+\begin{frame}[fragile]
+\frametitle{\centerline{Proof Tree: Rules as Inductive Data Structures}}
+One more thing...
+
+\begin{verbatim}
+AndI :: (Seqt ctx, Seqt p, Seqt q) => 
+        Derives ctx p ->
+        Derives ctx q ->
+        Derives ctx (p /\ q)
+\end{verbatim}
+
+\end{frame}
 
 %--------------------------------------------------------
 
