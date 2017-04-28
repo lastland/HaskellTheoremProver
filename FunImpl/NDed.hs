@@ -119,7 +119,7 @@ botEInt f (Seq ctx Bot) = Just (Seq ctx f)
 botEInt _ _             = Nothing
 
 -------------------------------------------------------------------------------
-        --Intuitionistic functions (carried with proofs)
+        --Intuitionistic functions (carried with proof-trees)
 -------------------------------------------------------------------------------
 
 type Pf = Proof.Proof Maybe Sequent
@@ -168,7 +168,7 @@ botECl f (Seq ctx Bot)
 botECl _ _                     = Nothing
 
 ------------------------------------------------------------------------
-        --Classical function (carried with proofs)
+        --Classical function (carried with proof-trees)
 ------------------------------------------------------------------------
 
 botEClP :: Formula -> Pf -> Pf
