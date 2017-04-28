@@ -173,3 +173,5 @@ botECl _ _                     = Nothing
 
 botEClP :: Formula -> Pf -> Pf
 botEClP = lift1 . botECl
+
+------------------------------------------------------------------------

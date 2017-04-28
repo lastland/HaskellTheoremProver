@@ -42,3 +42,5 @@ testCl = "Classical Theorems" ~:
                   printT (peirceL (Var 'a') (Var 'b'))
                        ~?= "|- ((a ~> b) ~> a) ~> a"]
          where printT = showMaybeTheorem . getTree
+
+--------------------------------------------------------------------------
