@@ -113,17 +113,17 @@ flipCtxRC :: DerivesGC ctxl (Formula r : Formula s : ctxr) ->
              DerivesGC ctxl (Formula s : Formula r : ctxr)
 flipCtxRC = ExRC contrDerEmp BotGC BotGC BotGC
 
--- |- p \/ ~p (Gentzen Style)
+-- |- p \/ ~p 
 lemG :: DerivesGC '[]
                  '[Formula (p :\/: (p :~>: Bot))]
 lemG = CnRC (OrR1C (flipCtxRC (OrR2C (ImpRC (flipCtxRC IdGC)))))
 
--- |- ((p -> q) -> p) -> p (Gentzen Style)
+-- |- ((p -> q) -> p) -> p 
 peirceLG :: DerivesGC '[]
                      '[Formula (((p :~>: q) :~>: p) :~>: p)]
 peirceLG = ImpRC (CnLC (ImpLC (ImpRC (flipCtxRC IdGC)) IdGC))
 
--- p -> q |- ~p \/ q (Gentzen Style)
+-- p -> q |- ~p \/ q 
 impOrG :: DerivesGC '[Formula (p :~>: q)]
                     '[Formula ((p :~>: Bot) :\/: q)]
 impOrG = CnLC (ImpLC (flipCtxRC (OrR1C (ImpRC (flipCtxRC IdGC)))) (OrR2C IdGC))
