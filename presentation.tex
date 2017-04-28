@@ -154,7 +154,7 @@ $$ \infer[(\wedge \text{E}2)]{\Gamma \vdash \phi_2}{\Gamma \vdash \phi_1 \wedge 
  \end{problem}
  \vp \pause
 \begin{itemize}
-\item Rules of inference as functions on sequents \pause
+\item Rules of inference as partial functions on sequents \pause
 \item Rules of inference as constructors of an inductive data structure
 \end{itemize} 
  
@@ -178,7 +178,7 @@ $$\infer[(\vee \text{I}1)]{\Gamma \vdash \phi_1 \vee \phi_2}{\Gamma \vdash \phi_
 
 \begin{frame}
 \frametitle{\centerline{In Kind Formula}}
-\centerline{\texttt{distr :: Derives '[And p (Or q r)] ->}} \centerline{\texttt{(Or (And p r) (And q r))}}
+\centerline{\texttt{distr :: Derives '[And p (Or q r)] ->}} \centerline{\texttt{(Or (And p q) (And p r))}}
 \pause \vspace*{20pt}
 
 \centerline{\texttt{OrI1 :: Derives ctx p -> Derives ctx (Or p q)}} \pause \vspace*{20pt}
@@ -249,9 +249,13 @@ $$\infer[(\vee \text{I}1)]{\Gamma \vdash \phi_1 \vee \phi_2}{\Gamma \vdash \phi_
 
 \begin{frame}
 \frametitle{\centerline{Derivation and Evidence in one go}}
-\centerline{\texttt{distr :: Derives '[Formula (p :$\wedge$: (q :$\vee$: r))] ->}}
+\centerline{\texttt{distrD :: Derives '[Formula (p :$\wedge$: (q :$\vee$: r))]}}
 
-\centerline{\texttt{(Formula ((p :$\wedge$ r) :$\vee$: (q :$\wedge$: r)))}}
+\centerline{\texttt{(Formula ((p :$\wedge$: q) :$\vee$: (p :$\wedge$: r)))}}
+\vspace*{20pt}
+\centerline{\texttt{distrE :: Evidence '[Formula (p :$\wedge$: (q :$\vee$: r))]}}
+
+\centerline{\texttt{(Formula ((p :$\wedge$: q) :$\vee$: (p :$\wedge$: r)))}}
 \pause
 \vspace{20pt}
 \begin{itemize}
@@ -274,7 +278,7 @@ x : p \wedge (q \vee r) \vdash \text{ case } & (\text{snd } x) \\
  \vspace*{20pt}
  
 \begin{verbatim}
- distr :: Derives '[IsProof x (p :/\: (q :\/: r))]
+ distrP :: Derives '[IsProof x (p :/\: (q :\/: r))]
                       (Case (Proj2 x) 
                          x1 (Inj1 (Pair (Proj1 x) x1))
                          x2 (Inj2 (Pair (Proj1 x) x2)))
@@ -289,7 +293,7 @@ x : p \wedge (q \vee r) \vdash \text{ case } & (\text{snd } x) \\
 
 \begin{frame}
 \frametitle{\centerline{Derivation provides evidence of its derivant}} 
-\center{\texttt{Derives ctx p (Formula a) $\to$ Evidence ctx (Formula a)}}
+\center{\texttt{Derives ctx (Formula a) $\to$ Evidence ctx (Formula a)}}
 \end{frame}
 
 %-------------------------------------------------------------------------------------------
